@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie List</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://apis.google.com/js/api:client.js"></script> <!-- Google APIライブラリ -->
+</head>
+<body>
+    <h1>Movie List</h1>
+
+    <!-- メールアドレスとパスワードの入力フォーム -->
+    <form id="loginForm">
+        <label for="mail">メールアドレス:</label>
+        <input type="email" id="mail" required>
+        <br>
+        <label for="pass">パスワード:</label>
+        <input type="password" id="pass" required>
+        <br>
+        <button type="submit">ログイン</button>
+    </form>
+
+    <h2>動画アップロード</h2>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <label for="title">タイトル:</label>
+        <input type="text" name="title" id="title" required><br><br>
+        
+        <label for="language">言語:</label>
+        <input type="text" name="language" id="language" required><br><br>
+        
+        <label for="tags">タグ:</label>
+        <input type="text" name="tags" id="tags" required><br><br>
+        
+        <label for="video">動画ファイル:</label>
+        <input type="file" name="video" id="video" accept="video/*" required><br><br>
+        
+        <input type="submit" value="アップロード">
+    </form>
+
+    <div id="message"></div>
+
+    <div id="movieList"></div>
+
+    <script>
+                function fetchMovieList() {
+            axios.post('https://devesion.main.jp/jphacks/api/main.php', {
+                get_movie_list: ''  // POSTデータとして送信
+            },{
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
+            .then(function (response) {
+                // サーバーから返却されたデータを処理
+                console.log(response.data);
+                const movieList = document.getElementById('movieList');
+                
+                if (Array.isArray(response.data)) {
+                    // 映画リストをHTMLに追加
+                    movieList.innerHTML = '';
+                    response.data.forEach(function (movie) {
+                        const movieItem = document.createElement('div');
+                        
+                        // 動画を表示するための movie タグ
+                        const videoElement = document.createElement('video');
+                        videoElement.setAttribute('controls', ''); // コントロールを表示
+                        videoElement.setAttribute('width', '600'); // 幅を設定
+
+                        const sourceElement = document.createElement('source');
+                        sourceElement.setAttribute('src', movie.movie_url); // APIから取得したURLを設定
+                        sourceElement.setAttribute('type', 'video/mp4'); // 動画形式を指定
+
+                        // video タグに source タグを追加
+                        videoElement.appendChild(sourceElement);
+                        movieItem.appendChild(videoElement);
+                        
+                        // 映画のタイトルを表示
+                        const titleElement = document.createElement('p');
+                        titleElement.textContent = movie.title || "無題"; // タイトルがない場合は「無題」と表示
+                        movieItem.appendChild(titleElement);
+                        
+                        movieList.appendChild(movieItem);
+                    });
+                } else if (response.data.error) {
+                    // エラーメッセージの表示
+                    movieList.textContent = 'Error: ' + response.data.error;
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+                const movieList = document.getElementById('movieList');
+                movieList.textContent = 'Failed to fetch movie list.';
+            });
+        }
+
+        // ページロード時に映画リストを取得
+        window.onload = fetchMovieList;
+
+        // ログインフォームの送信イベントを処理
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // フォームのデフォルト動作をキャンセル
+
+            const mail = document.getElementById('mail').value;
+            const pass = document.getElementById('pass').value;
+
+            axios.post('https://devesion.main.jp/jphacks/api/main.php', {
+                login:'',
+                mail: mail,
+                pass: pass
+            },{
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
+            .then(function (response) {
+                console.log(response.data);
+                const movieList = document.getElementById('movieList');
+                if (response.data.login) {
+                    if (response.data.create) {
+                        movieList.textContent = '新しいアカウントが作成されました。';
+                    } else {
+                        movieList.textContent = 'ログインしました。';
+                    }
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+                const movieList = document.getElementById('movieList');
+                movieList.textContent = 'ログインに失敗しました。';
+            });
+        });
+
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // フォームのデフォルト動作をキャンセル
+
+            const formData = new FormData(this);
+            axios.post('https://devesion.main.jp/jphacks/api/upload_video.php', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
+            .then(function (response) {
+                console.log(response.data);
+                const message = document.getElementById('message');
+                message.textContent = response.data; // レスポンスメッセージを表示
+            })
+            .catch(function (error) {
+                console.error('Error:', error);
+                const message = document.getElementById('message');
+                message.textContent = 'アップロードに失敗しました。'; // エラーメッセージ
+            });
+        });
+    </script>
+</body>
+</html>
