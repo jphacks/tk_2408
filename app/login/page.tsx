@@ -7,19 +7,42 @@ import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import axios from "axios";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const [error, setError] = useState(""); // 追加
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Login attempt with:", email, password);
-    router.push("/");
+    setError(""); // エラーをリセット
+    try {
+      const response = await axios.post('https://devesion.main.jp/jphacks/api/main.php', {
+        login: '',
+        mail: email,
+        pass: password
+      }, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      const isLogin = response.data.login;
+      const isCreate = response.data.create;
+      if (!isCreate && isLogin) {
+        router.push("/");
+      } else if (isCreate && !isLogin) {
+        router.push("/complete-register");
+      } else {
+        setError("ログインに失敗しました。メールアドレスとパスワードを確認してください。");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      setError("ログイン中にエラーが発生しました。後でもう一度お試しください。");
+    }
   };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#face56] to-[#00ffff]">
       <div className="max-w-md w-full space-y-8 p-10 bg-background rounded-3xl shadow-2xl transform transition-all hover:scale-105">
@@ -102,7 +125,10 @@ export default function LoginPage() {
               </Link>
             </div>
           </div>
-
+   
+          {error && (
+            <div className="text-red-500 text-sm text-center">{error}</div>
+          )}
           <div>
             <Button
               type="submit"

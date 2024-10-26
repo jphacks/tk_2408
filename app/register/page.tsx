@@ -7,7 +7,7 @@ import { Eye, EyeOff, UserPlus, Mail, Lock } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
+import axios from "axios";
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -15,12 +15,41 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState(""); // 追加
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Registration attempt with:", username, email, password);
-    router.push("/");
+    setError(""); // エラーをリセット
+    try {
+      console.log(email, password);
+      const response = await axios.post('https://devesion.main.jp/jphacks/api/main.php', {
+        login: '',
+        mail: email,
+        pass: password
+      }, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      const isCreate = response.data.create;
+      const isLogin = response.data.login;
+      console.log(isCreate);
+      console.log(isLogin);
+      if (!isCreate && isLogin) {
+        setError("すでにアカウントがあります。ログインしてください。");
+        return
+      }
+      if (isCreate && !isLogin) {
+        router.push("/complete-register");
+      } else {
+        setError("ログインに失敗しました。メールアドレスとパスワードを確認してください。");
+      }
+    } catch (error) {
+      console.log(error);
+      console.error("Login error:", error);
+      setError("ログイン中にエラーが発生しました。後でもう一度お試しください。");
+    }
   };
 
   return (
@@ -36,7 +65,7 @@ export default function RegisterPage() {
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
-            <div className="relative">
+            {/* <div className="relative">
               <label htmlFor="username" className="sr-only">
                 ユーザー名
               </label>
@@ -51,7 +80,7 @@ export default function RegisterPage() {
                 onChange={(e) => setUsername(e.target.value)}
               />
               <UserPlus className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-            </div>
+            </div> */}
             <div className="relative">
               <label htmlFor="email-address" className="sr-only">
                 メールアドレス
@@ -126,7 +155,9 @@ export default function RegisterPage() {
               </button>
             </div>
           </div>
-
+          {error && (
+            <div className="text-red-500 text-sm text-center">{error}</div>
+          )}
           <div>
             <Button
               type="submit"
@@ -143,7 +174,7 @@ export default function RegisterPage() {
               href="/login"
               className="font-medium text-primary hover:text-primary/80 transition-colors"
             >
-              Sign in
+              ログイン
             </Link>
           </p>
         </div>
