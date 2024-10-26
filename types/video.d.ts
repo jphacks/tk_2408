@@ -1,9 +1,8 @@
 export interface Video {
-  id: string;
+  movie_id: string;
   title: string;
-  thumbnail: string;
-  channelId: string;
-  channelName: string;
-  views: string;
-  timestamp: string;
+  thumbnail_url: string;
+  tags: string;
+  movie_url: string;
+  language: string;
 }
