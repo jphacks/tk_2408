@@ -21,6 +21,30 @@
         <button type="submit">ログイン</button>
     </form>
 
+    <!-- Vtuberのメールアドレスとパスワードの入力フォーム-->
+    <form id="loginVtuberForm" enctype="multipart/form-data">
+        <label for="vmail">メールアドレス:</label>
+        <input type="email" id="vmail" name="vmail" required>
+        <br>
+        <label for="vpass">パスワード:</label>
+        <input type="password" id="vpass" name="vpass" required>
+        <br>
+        <label for="vname">チャンネル名:</label>
+        <input type="text" id="vname" name="vname" required>
+        <br>
+        <label for="vbanner">バナー画像:</label>
+        <input type="file" name="vbanner" id="vbanner" accept="image/*" required><br><br>
+        <br>
+        <label for="vdescription">説明:</label>
+        <textarea id="vdescription" name="vdescription" required></textarea>
+        <br>
+        <label for="vlanguage">言語:</label>
+        <input type="text" id="vlanguage" name="vlanguage" required>
+        <br>
+        <button type="submit">ログイン</button>
+    </form>
+    
+
     <h2>動画アップロード</h2>
     <form id="uploadForm" enctype="multipart/form-data">
         <label for="title">タイトル:</label>
@@ -31,9 +55,12 @@
         
         <label for="tags">タグ:</label>
         <input type="text" name="tags" id="tags" required><br><br>
+
+        <label for="thumbnail">サムネイル画像:</label>
+        <input type="file" name="thumbnail" id="thumbnail" accept="image/*" required><br><br>
         
-        <label for="video">動画ファイル:</label>
-        <input type="file" name="video" id="video" accept="video/*" required><br><br>
+        <label for="movie">動画ファイル:</label>
+        <input type="file" name="movie" id="movie" accept="video/*" required><br><br>
         
         <input type="submit" value="アップロード">
     </form>
@@ -43,7 +70,7 @@
     <div id="movieList"></div>
 
     <script>
-                function fetchMovieList() {
+        function fetchMovieList() {
             axios.post('https://devesion.main.jp/jphacks/api/main.php', {
                 get_movie_list: ''  // POSTデータとして送信
             },{
@@ -131,11 +158,43 @@
             });
         });
 
+        //Vtuberログイン処理
+        document.getElementById('loginVtuberForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // フォームのデフォルト動作をキャンセル
+
+            const formData = new FormData(this);
+            formData.append('login_vtuber', '');
+
+            axios.post('https://devesion.main.jp/jphacks/api/main.php', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
+            .then(function (response) {
+                console.log(response.data);
+                const movieList = document.getElementById('movieList');
+                if (response.data.login) {
+                    if (response.data.create) {
+                        movieList.textContent = '新しいアカウントが作成されました。';
+                    } else {
+                        movieList.textContent = 'ログインしました。';
+                    }
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+                const movieList = document.getElementById('movieList');
+                movieList.textContent = 'ログインに失敗しました。';
+            });
+        });
+
         document.getElementById('uploadForm').addEventListener('submit', function(event) {
             event.preventDefault(); // フォームのデフォルト動作をキャンセル
 
             const formData = new FormData(this);
-            axios.post('https://devesion.main.jp/jphacks/api/upload_video.php', formData, {
+            formData.append('post_movie', '');
+            formData.append('channel_id', 1);//ログインしているVtuberの値
+            axios.post('https://devesion.main.jp/jphacks/api/main.php', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -143,7 +202,7 @@
             .then(function (response) {
                 console.log(response.data);
                 const message = document.getElementById('message');
-                message.textContent = response.data; // レスポンスメッセージを表示
+                message.textContent = response.data.video_url; // レスポンスメッセージを表示
             })
             .catch(function (error) {
                 console.error('Error:', error);
