@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Googleログイン</title>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta name="google-signin-client_id" content="YOUR_GOOGLE_CLIENT_ID">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Googleログインデモ</h1>
+    <div id="g_id_onload"
+         data-client_id="444041128917-pecu2ujs1n0f3g6adqrrqrmofvtc76pg.apps.googleusercontent.com"
+         data-callback="handleCredentialResponse">
+    </div>
+    <div class="g_id_signin" data-type="standard"></div>
+    <pre id="content"></pre>
+
+    <script>
+        function handleCredentialResponse(response) {
+            // Googleからの応答を処理します
+            const content = document.getElementById('content');
+            const user = jwt_decode(response.credential);
+            content.innerText = `Hello, ${user.name}!`;
+        }
+
+        // JWTをデコードするためのライブラリを使用します
+        function jwt_decode(token) {
+            const payload = token.split('.')[1];
+            return JSON.parse(atob(payload));
+        }
+    </script>
+</body>
+</html>
