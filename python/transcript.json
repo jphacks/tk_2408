@@ -1,0 +1,82 @@
+{
+  "duration": 9.399999618530273,
+  "language": "english",
+  "text": "You're such a troublemaker, Usagi-san! You're a zombie! Does that Pekora have any feelings at all?",
+  "segments": [
+    {
+      "id": 0,
+      "avg_logprob": -0.9008601307868958,
+      "compression_ratio": 1.0537633895874023,
+      "end": 2.359999895095825,
+      "no_speech_prob": 0.03196346014738083,
+      "seek": 0,
+      "start": 0.0,
+      "temperature": 0.0,
+      "text": " You're such a troublemaker, Usagi-san!",
+      "tokens": [
+        50364,
+        509,
+        434,
+        1270,
+        257,
+        3455,
+        1113,
+        4003,
+        11,
+        4958,
+        20291,
+        12,
+        11491,
+        0,
+        50482
+      ]
+    },
+    {
+      "id": 1,
+      "avg_logprob": -0.9008601307868958,
+      "compression_ratio": 1.0537633895874023,
+      "end": 5.519999980926514,
+      "no_speech_prob": 0.03196346014738083,
+      "seek": 0,
+      "start": 4.079999923706055,
+      "temperature": 0.0,
+      "text": " You're a zombie!",
+      "tokens": [
+        50568,
+        509,
+        434,
+        257,
+        20310,
+        0,
+        50640
+      ]
+    },
+    {
+      "id": 2,
+      "avg_logprob": -0.9008601307868958,
+      "compression_ratio": 1.0537633895874023,
+      "end": 9.359999656677246,
+      "no_speech_prob": 0.03196346014738083,
+      "seek": 0,
+      "start": 5.519999980926514,
+      "temperature": 0.0,
+      "text": " Does that Pekora have any feelings at all?",
+      "tokens": [
+        50640,
+        4402,
+        300,
+        430,
+        916,
+        3252,
+        362,
+        604,
+        6640,
+        412,
+        439,
+        30,
+        50832
+      ]
+    }
+  ],
+  "task": "translate"
+}

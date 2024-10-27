@@ -35,7 +35,7 @@ export default function Home() {
 
     fetchVideos();
   }, []);
-  
+
   const handleNavigation = (video: Video) => {
     const params = new URLSearchParams();
     params.append("title", video.title);
