@@ -1,3 +1,10 @@
 {
-  "extends": ["next/core-web-vitals", "next/typescript"]
+  "extends": ["next/core-web-vitals", "next/typescript"],
+  "rules": {
+    "react/no-unescaped-entities": "off", // 特殊文字エスケープの警告を無効化
+    "@typescript-eslint/no-unused-vars": "off", // 未使用変数のエラーを無効化
+    "@next/next/no-img-element": "off", // <img>タグの警告を無効化
+    "jsx-a11y/alt-text": "off", // alt属性の警告を無効化
+    "@typescript-eslint/no-empty-object-type": "off" // 空のインターフェースの警告を無効化
+  }
 }

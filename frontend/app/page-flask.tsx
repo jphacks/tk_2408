@@ -4,15 +4,16 @@ import React, { useState } from "react";
 import axios from "axios";
 
 export default function Home() {
-  const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0] || null;
+    setFile(selectedFile);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!file) {
       alert("ファイルを選択してください");
@@ -24,7 +25,7 @@ export default function Home() {
     formData.append("file", file);
 
     try {
-      const response = await axios.post("http://127.0.0.1:5000/", formData, {
+      const response = await axios.post<{ filename: string }>('http://127.0.0.1:5000/', formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
