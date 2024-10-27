@@ -17,7 +17,6 @@ import { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import * as Slider from "@radix-ui/react-slider";
 import screenfull from "screenfull";
-import styles from "./VideoPage.module.css"; // 新しく追加するCSSモジュール
 
 export default function VideoPage() {
   const [playing, setPlaying] = useState(false);
@@ -144,152 +143,156 @@ export default function VideoPage() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto py-8">
+      <main className="container mx-auto py-8 px-4 lg:px-0">
         <div className="bg-black">
-          <div className="max-w-4xl mx-auto relative">
-            {" "}
-            {/* ここを変更 */}
-            <div ref={videoContainerRef} className="aspect-video">
-              {" "}
-              {/* アスペクト比を維持 */}
+          <div className="max-w-6xl mx-auto relative">
+            <div ref={videoContainerRef} className="w-full">
               {showThumbnail ? (
-                // ... existing code ...
-                <div className="absolute inset-0 flex items-center justify-center">
+                <div className="relative">
                   <img
                     src={videoData.thumbnail_url}
                     alt={videoData.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-auto"
                   />
                   <Button
                     variant="ghost"
-                    size="icon"
-                    className="absolute z-10 text-white bg-gradient-to-r from-purple-500 to-pink-500 rounded-full p-8 hover:from-purple-600 hover:to-pink-600 hover:scale-110 transition-all duration-300 shadow-lg"
+                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 text-white bg-gradient-to-r from-purple-500 to-pink-500 rounded-md px-6 py-6 hover:from-purple-600 hover:to-pink-600 hover:scale-105 transition-all duration-300 shadow-lg flex items-center hover:text-white"
                     onClick={handlePlayPause}
                   >
-                    ▶️
+                    <Play className="h-6 w-6 mr-2" />
+                    Play
                   </Button>
                 </div>
               ) : (
-                // ... existing code ...
                 <video
                   ref={videoRef}
                   src={videoData.movie_url}
-                  className="w-full h-full object-cover"
+                  className="w-full h-auto"
                   onTimeUpdate={handleTimeUpdate}
                   onDurationChange={handleDurationChange}
                 />
               )}
             </div>
           </div>
-        </div>
-        <div className="bg-gray-800 w-full">
-          <div className="container mx-auto px-4 py-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-white hover:text-primary transition-colors"
-                  onClick={handlePlayPause}
-                >
-                  {playing ? (
-                    <Pause className="h-6 w-6" />
-                  ) : (
-                    <Play className="h-6 w-6" />
-                  )}
-                </Button>
-                <div className="text-white text-sm">
-                  {formatTime(currentTime)} / {formatTime(duration)}
-                </div>
-              </div>
-              <div className="flex-grow mx-4">
-                <Slider.Root
-                  className="relative flex items-center select-none touch-none w-full h-5"
-                  value={[currentTime]}
-                  max={duration}
-                  step={0.1}
-                  onValueChange={handleSeekChange}
-                >
-                  <Slider.Track className="bg-gray-600 relative grow rounded-full h-1">
-                    <Slider.Range className="absolute bg-white rounded-full h-full" />
-                  </Slider.Track>
-                  <Slider.Thumb
-                    className="block w-4 h-4 bg-white rounded-full focus:outline-none focus-visible:ring focus-visible:ring-white focus-visible:ring-opacity-75"
-                    aria-label="Seek"
-                  />
-                </Slider.Root>
-              </div>
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
+          <div className="bg-gray-800 w-full">
+            <div className="container mx-auto px-4 py-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
                   <Button
                     variant="ghost"
                     size="icon"
                     className="text-white hover:text-primary transition-colors"
-                    onClick={handleToggleMute}
+                    onClick={handlePlayPause}
                   >
-                    {muted ? (
-                      <VolumeX className="h-6 w-6" />
+                    {playing ? (
+                      <Pause className="h-6 w-6" />
                     ) : (
-                      <Volume2 className="h-6 w-6" />
+                      <Play className="h-6 w-6" />
                     )}
                   </Button>
+                  <div className="text-white text-sm">
+                    {formatTime(currentTime)} / {formatTime(duration)}
+                  </div>
+                </div>
+                <div className="flex-grow mx-4">
                   <Slider.Root
-                    className="relative flex items-center select-none touch-none w-24 h-5"
-                    value={[muted ? 0 : volume]}
-                    max={1}
+                    className="relative flex items-center select-none touch-none w-full h-5"
+                    value={[currentTime]}
+                    max={duration}
                     step={0.1}
-                    onValueChange={handleVolumeChange}
+                    onValueChange={handleSeekChange}
                   >
                     <Slider.Track className="bg-gray-600 relative grow rounded-full h-1">
                       <Slider.Range className="absolute bg-white rounded-full h-full" />
                     </Slider.Track>
                     <Slider.Thumb
                       className="block w-4 h-4 bg-white rounded-full focus:outline-none focus-visible:ring focus-visible:ring-white focus-visible:ring-opacity-75"
-                      aria-label="Volume"
+                      aria-label="Seek"
                     />
                   </Slider.Root>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-white hover:text-primary transition-colors"
-                  onClick={handleToggleFullscreen}
-                >
-                  {isFullscreen ? (
-                    <Minimize className="h-6 w-6" />
-                  ) : (
-                    <Maximize className="h-6 w-6" />
-                  )}
-                </Button>
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-white hover:text-primary transition-colors"
+                      onClick={handleToggleMute}
+                    >
+                      {muted ? (
+                        <VolumeX className="h-6 w-6" />
+                      ) : (
+                        <Volume2 className="h-6 w-6" />
+                      )}
+                    </Button>
+                    <Slider.Root
+                      className="relative flex items-center select-none touch-none w-24 h-5"
+                      value={[muted ? 0 : volume]}
+                      max={1}
+                      step={0.1}
+                      onValueChange={handleVolumeChange}
+                    >
+                      <Slider.Track className="bg-gray-600 relative grow rounded-full h-1">
+                        <Slider.Range className="absolute bg-white rounded-full h-full" />
+                      </Slider.Track>
+                      <Slider.Thumb
+                        className="block w-4 h-4 bg-white rounded-full focus:outline-none focus-visible:ring focus-visible:ring-white focus-visible:ring-opacity-75"
+                        aria-label="Volume"
+                      />
+                    </Slider.Root>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-white hover:text-primary transition-colors"
+                    onClick={handleToggleFullscreen}
+                  >
+                    {isFullscreen ? (
+                      <Minimize className="h-6 w-6" />
+                    ) : (
+                      <Maximize className="h-6 w-6" />
+                    )}
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
         </div>
-        <div className="max-w-12xl mx-auto mt-8">
-          <h1 className="text-2xl font-bold mb-4">{videoData.title}</h1>
-          <div className="flex space-x-2 mb-4">
-            <Button variant="outline" size="sm">
-              <ThumbsUp className="mr-2 h-4 w-4" />
-              Like
+        <div className="max-w-12xl mx-auto mt-8 sm:px-6 lg:px-8">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2">
+            {videoData.title}
+          </h1>
+          <div className="mb-4">
+            <p className="text-base text-muted-foreground">
+              Language: {videoData.language}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3 mb-4">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-grow sm:flex-grow-0"
+            >
+              <ThumbsUp className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+              <span className="hidden sm:inline">Like</span>
             </Button>
-            <Button variant="outline" size="sm">
-              <ThumbsDown className="mr-2 h-4 w-4" />
-              Dislike
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-grow sm:flex-grow-0"
+            >
+              <ThumbsDown className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+              <span className="hidden sm:inline">Dislike</span>
             </Button>
-            <Button variant="outline" size="sm">
-              <Share2 className="mr-2 h-4 w-4" />
-              Share
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-grow sm:flex-grow-0"
+            >
+              <Share2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+              <span className="hidden sm:inline">Share</span>
             </Button>
           </div>
-        </div>
-        <div className="text-sm text-muted-foreground mb-4">
-          {videoData.tags}
-        </div>
-        <div className="border-t border-b py-4 mb-4">
-          <h2 className="font-semibold mb-2">{videoData.channelName}</h2>
-          <p className="text-sm text-muted-foreground">
-            Language: {videoData.language}
-          </p>
         </div>
         {/* Add a comment section here */}
       </main>

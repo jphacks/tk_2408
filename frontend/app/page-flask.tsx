@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState } from "react";
+import axios from "axios";
 
 export default function Home() {
   const [uploading, setUploading] = useState(false);
@@ -16,24 +16,24 @@ export default function Home() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!file) {
-      alert('ファイルを選択してください');
+      alert("ファイルを選択してください");
       return;
     }
 
     setUploading(true);
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append("file", file);
 
     try {
       const response = await axios.post<{ filename: string }>('http://127.0.0.1:5000/', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
       setResult(response.data.filename);
     } catch (error) {
-      console.error('エラーが発生しました:', error);
-      alert('アップロードに失敗しました');
+      console.error("エラーが発生しました:", error);
+      alert("アップロードに失敗しました");
     } finally {
       setUploading(false);
     }
@@ -45,13 +45,17 @@ export default function Home() {
       <form onSubmit={handleSubmit}>
         <input type="file" onChange={handleFileChange} />
         <button type="submit" disabled={uploading}>
-          {uploading ? 'アップロード中...' : 'アップロード'}
+          {uploading ? "アップロード中..." : "アップロード"}
         </button>
       </form>
       {result && (
         <div>
           <h3>処理結果</h3>
-          <a href={`http://127.0.0.1:5000/outputs/${result}`} target="_blank" rel="noopener noreferrer">
+          <a
+            href={`http://127.0.0.1:5000/outputs/${result}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             処理済みファイルを表示
           </a>
         </div>

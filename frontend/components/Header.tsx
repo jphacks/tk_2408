@@ -11,6 +11,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function Header() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -30,10 +31,16 @@ export default function Header() {
   };
 
   return (
-    <header className="flex items-center justify-between p-4 bg-primary-background border-b">
+    <header className="flex items-center justify-between px-4 py-2 border-b bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500">
       <div className="mr-4 hidden md:flex">
         <Link className="mr-6 flex items-center space-x-2" href="/">
-          <span className="text-2xl font-bold">YourTube</span>
+          <Image
+            src="/vany-logo.png"
+            alt="YourTube Logo"
+            width={100}
+            height={100}
+            priority
+          />
         </Link>
         {/* <nav className="flex items-center space-x-6 text-sm font-medium">
           <Link href="/">ホーム</Link>
@@ -65,15 +72,25 @@ export default function Header() {
             size="icon"
             className="relative h-8 w-8 rounded-full hover:rounded-full"
           >
-            <Avatar className="h-8 w-8">
-              <AvatarImage src="/placeholder-user.jpg" alt="@username" />
-              <AvatarFallback>UN</AvatarFallback>
-            </Avatar>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative h-8 w-8 rounded-full hover:rounded-full"
+            >
+              <Avatar className="h-8 w-8 ring-1 ring-primary ring-offset-2 ring-offset-background transition-all duration-300 hover:scale-110">
+                <AvatarImage
+                  src="/placeholder-user.jpg"
+                  alt="@username"
+                  className="object-cover"
+                />
+                <AvatarFallback className="bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500" />
+              </Avatar>
+            </Button>
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-56" align="end" forceMount>
           <div className="grid gap-4">
-            <div className="flex items-center gap-4">
+            {/* <div className="flex items-center gap-4">
               <Avatar className="h-10 w-10">
                 <AvatarImage src="/placeholder-user.jpg" alt="@username" />
                 <AvatarFallback>UN</AvatarFallback>
@@ -84,22 +101,22 @@ export default function Header() {
                   user@example.com
                 </p>
               </div>
-            </div>
+            </div> */}
             <div className="grid gap-2">
-              <Link
+              {/* <Link
                 href="/channel-settings"
                 className="flex w-full items-center space-x-2 hover:bg-accent hover:text-accent-foreground rounded-md p-2 text-sm transition-colors"
               >
                 <Settings className="h-4 w-4" />
                 <span>Channel Settings</span>
-              </Link>
-              <Link
+              </Link> */}
+              {/* <Link
                 href="/account-settings"
                 className="flex w-full items-center space-x-2 hover:bg-accent hover:text-accent-foreground rounded-md p-2 text-sm transition-colors"
               >
                 <User className="h-4 w-4" />
                 <span>Account Settings</span>
-              </Link>
+              </Link> */}
               <Link
                 href="/upload"
                 className="flex w-full items-center space-x-2 hover:bg-accent hover:text-accent-foreground rounded-md p-2 text-sm transition-colors"
