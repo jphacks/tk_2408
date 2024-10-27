@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Upload, X } from "lucide-react";
 
@@ -33,6 +33,18 @@ export default function UploadPage() {
     message: "",
   });
   const router = useRouter();
+
+  useEffect(() => {
+    // Check for userId or vtubeId in localStorage
+    const userId = localStorage.getItem("userId");
+    const vtubeId = localStorage.getItem("channelId");
+
+    if (!userId && !vtubeId) {
+      // Redirect to login page if neither exists
+      router.push("/login");
+      return;
+    }
+  }, [router]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {

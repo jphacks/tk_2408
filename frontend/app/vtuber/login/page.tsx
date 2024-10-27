@@ -10,11 +10,11 @@ import { Input } from "@/components/ui/input";
 import axios from "axios";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("test@gmail.com");
+  const [password, setPassword] = useState("pass");
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-  const [error, setError] = useState(""); // 追加
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

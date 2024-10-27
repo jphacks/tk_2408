@@ -17,6 +17,7 @@ import { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import * as Slider from "@radix-ui/react-slider";
 import screenfull from "screenfull";
+import { useRouter } from "next/navigation";
 
 export default function VideoPage() {
   const [playing, setPlaying] = useState(false);
@@ -37,6 +38,7 @@ export default function VideoPage() {
   });
   const [isFullscreen, setIsFullscreen] = useState(false);
   const videoContainerRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     setVideoData({
@@ -48,6 +50,18 @@ export default function VideoPage() {
       language: searchParams.get("language") || "",
     });
   }, [searchParams]);
+
+  useEffect(() => {
+    // Check for userId or vtubeId in localStorage
+    const userId = localStorage.getItem("userId");
+    const vtubeId = localStorage.getItem("channelId");
+
+    if (!userId && !vtubeId) {
+      // Redirect to login page if neither exists
+      router.push("/login");
+      return;
+    }
+  }, [router]);
 
   useEffect(() => {
     const handleFullscreenChange = () => {

@@ -25,11 +25,15 @@ export default function Home() {
     formData.append("file", file);
 
     try {
-      const response = await axios.post<{ filename: string }>('http://127.0.0.1:5000/', formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await axios.post<{ filename: string }>(
+        "http://127.0.0.1:5000/",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
       setResult(response.data.filename);
     } catch (error) {
       console.error("エラーが発生しました:", error);
