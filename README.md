@@ -1,5 +1,7 @@
 # 自動動画翻訳Vtuberプラットフォーム「Vany」
 
+作品URL：https://vany.vercel.app/
+
 ![Vany_yoko](https://github.com/user-attachments/assets/9d96905e-6daf-4fe8-a9b9-a9d7ce1eb3cd)
 
 デモ動画(日本語)
