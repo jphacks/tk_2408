@@ -157,7 +157,7 @@ export default function VideoPage() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto py-8 px-4 lg:px-0">
+      <main className="container mx-auto w-7/12 py-4 px-4 lg:px-0">
         <div className="bg-black">
           <div className="max-w-6xl mx-auto relative">
             <div ref={videoContainerRef} className="w-full">
