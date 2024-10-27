@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [videos, setVideos] = useState<Video[]>([]);
-  const [selectedLanguage, setSelectedLanguage] = useState("japanese");
+  const [selectedLanguage, setSelectedLanguage] = useState("all");
   const [filteredVideos, setFilteredVideos] = useState<Video[]>([]);
   const router = useRouter();
 
@@ -35,6 +35,7 @@ export default function Home() {
 
     fetchVideos();
   }, []);
+  
   const handleNavigation = (video: Video) => {
     const params = new URLSearchParams();
     params.append("title", video.title);
@@ -46,24 +47,27 @@ export default function Home() {
   };
 
   useEffect(() => {
-    // Check for userId or vtubeId in localStorage
     const userId = localStorage.getItem("userId");
     const vtubeId = localStorage.getItem("channelId");
 
     if (!userId && !vtubeId) {
-      // Redirect to login page if neither exists
       router.push("/login");
       return;
     }
   }, [router]);
+
   useEffect(() => {
     setFilteredVideos(
-      videos.filter((video) => video.language === selectedLanguage)
+      selectedLanguage === "all"
+        ? videos
+        : videos.filter((video) => video.language === selectedLanguage)
     );
   }, [videos, selectedLanguage]);
+
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedLanguage(e.target.value);
   };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -77,6 +81,7 @@ export default function Home() {
             onChange={handleLanguageChange}
             className="bg-card text-foreground border border-gray-300 rounded-md px-3 py-2"
           >
+            <option value="all">言語を選択</option>
             <option value="japanese">日本語</option>
             <option value="english">英語</option>
             {/* 他の言語オプションを必要に応じて追加 */}
@@ -119,34 +124,6 @@ export default function Home() {
             </div>
           ))}
         </div>
-        {/* <h1 className="text-2xl font-bold mb-6 text-foreground mt-12">
-          新着動画
-        </h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
-          {videos.map((video) => (
-            <Link href={`/video/${video.id}`} key={video.id} className="group">
-              <div key={video.id} className="group cursor-pointer">
-                <div className="bg-card rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105">
-                  <div className="aspect-video relative">
-                    <Image
-                      src={video.thumbnail}
-                      alt={video.title}
-                      layout="fill"
-                      objectFit="cover"
-                      className="transition-transform group-hover:scale-110"
-                    />
-                  </div>
-                  <div className="p-4">
-                    <h2 className="text-lg font-semibold line-clamp-2 text-foreground">
-                      {video.title}
-                    </h2>
-                    <p className="text-sm text-gray-500">{video.views}回再生</p>
-                  </div>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div> */}
       </main>
     </div>
   );
