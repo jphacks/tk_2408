@@ -2,3 +2,8 @@
 /extracted_audio/*
 /outputs/*
 /chunk/*
+
+.env.local
+.env
+
+.DS_Store
