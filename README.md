@@ -2,6 +2,14 @@
 
 ![Vany_yoko](https://github.com/user-attachments/assets/9d96905e-6daf-4fe8-a9b9-a9d7ce1eb3cd)
 
+デモ動画(日本語)
+
+https://github.com/user-attachments/assets/ca63223b-6e67-4800-95eb-137df4c20d2a
+
+デモ動画(英語)
+
+https://github.com/user-attachments/assets/7d125df0-193f-46fd-af83-341d0f106e78
+
 
 ## 製品概要
 
