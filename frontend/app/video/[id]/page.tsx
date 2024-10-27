@@ -157,9 +157,9 @@ export default function VideoPage() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto w-7/12 py-4 px-4 lg:px-0">
+      <main className="container mx-auto w-full md:w-10/12 lg:w-8/12 py-4 px-4">
         <div className="bg-black">
-          <div className="max-w-6xl mx-auto relative">
+          <div className="max-w-full md:max-w-3xl lg:max-w-6xl mx-auto relative">
             <div ref={videoContainerRef} className="w-full">
               {showThumbnail ? (
                 <div className="relative">
@@ -170,10 +170,10 @@ export default function VideoPage() {
                   />
                   <Button
                     variant="ghost"
-                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 text-white bg-gradient-to-r from-purple-500 to-pink-500 rounded-md px-6 py-6 hover:from-purple-600 hover:to-pink-600 hover:scale-105 transition-all duration-300 shadow-lg flex items-center hover:text-white"
+                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 text-white bg-gradient-to-r from-purple-500 to-pink-500 rounded-md px-6 py-3 lg:px-8 lg:py-4 hover:scale-105 transition-all duration-300"
                     onClick={handlePlayPause}
                   >
-                    <Play className="h-6 w-6 mr-2" />
+                    <Play className="h-6 w-6 lg:h-8 lg:w-8 mr-2" />
                     Play
                   </Button>
                 </div>
@@ -190,7 +190,7 @@ export default function VideoPage() {
           </div>
           <div className="bg-gray-800 w-full">
             <div className="container mx-auto px-4 py-2">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <Button
                     variant="ghost"
@@ -204,11 +204,11 @@ export default function VideoPage() {
                       <Play className="h-6 w-6" />
                     )}
                   </Button>
-                  <div className="text-white text-sm">
+                  <div className="text-white text-xs sm:text-sm">
                     {formatTime(currentTime)} / {formatTime(duration)}
                   </div>
                 </div>
-                <div className="flex-grow mx-4">
+                <div className="w-full sm:flex-grow mx-4 my-2 sm:my-0">
                   <Slider.Root
                     className="relative flex items-center select-none touch-none w-full h-5"
                     value={[currentTime]}
@@ -220,7 +220,7 @@ export default function VideoPage() {
                       <Slider.Range className="absolute bg-white rounded-full h-full" />
                     </Slider.Track>
                     <Slider.Thumb
-                      className="block w-4 h-4 bg-white rounded-full focus:outline-none focus-visible:ring focus-visible:ring-white focus-visible:ring-opacity-75"
+                      className="block w-4 h-4 bg-white rounded-full focus:outline-none"
                       aria-label="Seek"
                     />
                   </Slider.Root>
@@ -240,7 +240,7 @@ export default function VideoPage() {
                       )}
                     </Button>
                     <Slider.Root
-                      className="relative flex items-center select-none touch-none w-24 h-5"
+                      className="relative flex items-center select-none touch-none w-16 sm:w-24 h-5"
                       value={[muted ? 0 : volume]}
                       max={1}
                       step={0.1}
@@ -250,7 +250,7 @@ export default function VideoPage() {
                         <Slider.Range className="absolute bg-white rounded-full h-full" />
                       </Slider.Track>
                       <Slider.Thumb
-                        className="block w-4 h-4 bg-white rounded-full focus:outline-none focus-visible:ring focus-visible:ring-white focus-visible:ring-opacity-75"
+                        className="block w-4 h-4 bg-white rounded-full focus:outline-none"
                         aria-label="Volume"
                       />
                     </Slider.Root>
@@ -272,43 +272,30 @@ export default function VideoPage() {
             </div>
           </div>
         </div>
-        <div className="max-w-12xl mx-auto mt-8 sm:px-6 lg:px-8">
-          <h1 className="text-2xl sm:text-3xl font-bold mb-2">
+        <div className="max-w-full md:max-w-3xl lg:max-w-6xl mx-auto mt-8 px-4">
+          <h1 className="text-lg md:text-2xl font-bold mb-2">
             {videoData.title}
           </h1>
           <div className="mb-4">
-            <p className="text-base text-muted-foreground">
+            <p className="text-sm md:text-base text-muted-foreground">
               Language: {videoData.language}
             </p>
           </div>
           <div className="flex flex-wrap gap-3 mb-4">
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-grow sm:flex-grow-0"
-            >
+            <Button variant="outline" size="sm" className="flex-grow sm:flex-grow-0">
               <ThumbsUp className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
               <span className="hidden sm:inline">Like</span>
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-grow sm:flex-grow-0"
-            >
+            <Button variant="outline" size="sm" className="flex-grow sm:flex-grow-0">
               <ThumbsDown className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
               <span className="hidden sm:inline">Dislike</span>
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-grow sm:flex-grow-0"
-            >
+            <Button variant="outline" size="sm" className="flex-grow sm:flex-grow-0">
               <Share2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
               <span className="hidden sm:inline">Share</span>
             </Button>
           </div>
         </div>
-        {/* Add a comment section here */}
       </main>
     </div>
   );
