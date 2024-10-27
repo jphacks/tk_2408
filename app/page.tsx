@@ -62,7 +62,6 @@ export default function Home() {
               <div key={video.movie_id} className="group cursor-pointer">
                 <div className="bg-card rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105">
                   <div className="aspect-video relative">
-                    <p>{video.thumbnail_url}</p>
                     {video.thumbnail_url !== "" &&
                     video.thumbnail_url !== "1.png" ? (
                       <Image
