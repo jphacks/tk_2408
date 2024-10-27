@@ -32,7 +32,7 @@ export default function Header() {
 
   return (
     <header className="flex items-center justify-between px-4 py-2 border-b bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500">
-      <div className="mr-4 hidden md:flex">
+      <div className="mr-4">
         <Link className="mr-6 flex items-center space-x-2" href="/">
           <Image
             src="/vany-logo.png"
@@ -47,10 +47,6 @@ export default function Header() {
           <Link href="/trending">トレンド</Link>
         </nav> */}
       </div>
-      <Button variant="outline" size="icon" className="mr-2 md:hidden">
-        <Menu className="h-4 w-4" />
-        <span className="sr-only">Toggle Menu</span>
-      </Button>
       {/* <div className="flex flex-10 items-center justify-end space-x-2">
         <form onSubmit={handleSearch} className="w-full max-w-lg">
           <div className="relative">
@@ -72,20 +68,14 @@ export default function Header() {
             size="icon"
             className="relative h-8 w-8 rounded-full hover:rounded-full"
           >
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative h-8 w-8 rounded-full hover:rounded-full"
-            >
-              <Avatar className="h-8 w-8 ring-1 ring-primary ring-offset-2 ring-offset-background transition-all duration-300 hover:scale-110">
-                <AvatarImage
-                  src="/placeholder-user.jpg"
-                  alt="@username"
-                  className="object-cover"
-                />
-                <AvatarFallback className="bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500" />
-              </Avatar>
-            </Button>
+            <Avatar className="h-8 w-8 ring-1 ring-primary ring-offset-2 ring-offset-background transition-all duration-300 hover:scale-110">
+              <AvatarImage
+                src="/placeholder-user.jpg"
+                alt="@username"
+                className="object-cover"
+              />
+              <AvatarFallback className="bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500" />
+            </Avatar>
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-56" align="end" forceMount>
