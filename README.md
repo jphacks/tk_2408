@@ -145,3 +145,41 @@ OpenAI社のAPIを用いることで、タイムスタンプ付きの文字認�
 - 独自で開発したものの内容をこちらに記載してください
 - 特に力を入れた部分をファイルリンク、または commit_id を記載してください。
 https://github.com/jphacks/tk_2408/issues/6
+
+# 実行手順
+
+## Python実行手順
+
+1. `.env`ファイルを作成し、OPENAI_API_KEYとELEVENLABS_API_KEYを記載。
+
+2. `pip install -r requirements.txt`を実行
+
+3. `VIDEO_PATH`に入力動画を配置し、`EXTRACTED_AUDIO_PATH`に適当なパスを設定し、`python app.py`を実行すると、その声の翻訳動画が`OUTPUT_MOVIE_PATH`に配置される。
+
+注意：Elevenlabsの請求アカウントを登録しないと利用できません。
+
+## Flask実行手順
+
+1. 上記設定後、`python flask_main.py`を実行
+
+2. Webサイト上で動画アップロードすると翻訳される
+
+## Next.js実行手順
+
+1. `cd frontend`
+
+2. `npm install`
+
+3. `npx next dev`
+
+4. [このURL](http://localhost:3000/vtuber/login)にアクセスし、
+```
+メール：3848hiro@gmail.com
+パスワード：123456
+```
+
+5. [このURL](http://localhost:3000/upload)にアクセスし、サムネイル画像やビデオをアップロード
+
+6. 翻訳動画が生成、投稿される
+
+注意：Flaskを実行した状態でないと、動画のアップロード処理が動作しません。
