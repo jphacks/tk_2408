@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie List</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://apis.google.com/js/api:client.js"></script> <!-- Google APIライブラリ -->
+</head>
+<body>
+    <h1>Movie List</h1>
+
+    <label for="movie_id">動画ID:</label>
+    <input type="text" id="movie_id" name="movie_id" required>
+    <button type="button" id="movie_select">ログイン</button>
+
+    <!-- メールアドレスとパスワードの入力フォーム -->
+    <form id="loginForm">
+        <label for="mail">メールアドレス:</label>
+        <input type="email" id="mail" required>
+        <br>
+        <label for="pass">パスワード:</label>
+        <input type="password" id="pass" required>
+        <br>
+        <button type="submit">ログイン</button>
+    </form>
+
+    <h2>Vtuberログイン</h2>
+    <form id="loginVtuberForm">
+        <label for="vlmail">メールアドレス:</label>
+        <input type="email" id="vlmail" name="vlmail" required>
+        <br>
+        <label for="vlpass">パスワード:</label>
+        <input type="password" id="vlpass" name="vlpass" required>
+        <br>
+        <button type="button" id="loginVtuberButton">ログイン</button>
+    </form>
+
+    <!-- Vtuberのメールアドレスとパスワードの入力フォーム-->
+    <form id="createVtuberForm" enctype="multipart/form-data">
+        <label for="vmail">メールアドレス:</label>
+        <input type="email" id="vmail" name="vmail" required>
+        <br>
+        <label for="vpass">パスワード:</label>
+        <input type="password" id="vpass" name="vpass" required>
+        <br>
+        <label for="vname">チャンネル名:</label>
+        <input type="text" id="vname" name="vname" required>
+        <br>
+        <label for="vbanner">バナー画像:</label>
+        <input type="file" name="vbanner" id="vbanner" accept="image/*" required><br><br>
+        <br>
+        <label for="vdescription">説明:</label>
+        <textarea id="vdescription" name="vdescription" required></textarea>
+        <br>
+        <label for="vlanguage">言語:</label>
+        <input type="text" id="vlanguage" name="vlanguage" required>
+        <br>
+        <button type="submit">ログイン</button>
+    </form>
+    
+
+    <h2>動画アップロード</h2>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <label for="title">タイトル:</label>
+        <input type="text" name="title" id="title" required><br><br>
+        
+        <label for="language">言語:</label>
+        <input type="text" name="language" id="language" required><br><br>
+        
+        <label for="tags">タグ:</label>
+        <input type="text" name="tags" id="tags" required><br><br>
+
+        <label for="thumbnail">サムネイル画像:</label>
+        <input type="file" name="thumbnail" id="thumbnail" accept="image/*" required><br><br>
+        
+        <label for="movie">動画ファイル:</label>
+        <input type="file" name="movie" id="movie" accept="video/*" required><br><br>
+        
+        <input type="submit" value="アップロード">
+    </form>
+
+    <div id="message"></div>
+
+    <div id="movieList"></div>
+
+    <script>
+        //動画一覧を取得する関数
+        function fetchMovieList() {
+            axios.post('https://devesion.main.jp/jphacks/api/main.php', {
+                get_movie_list: ''  // POSTデータとして送信
+            },{
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
+            .then(function (response) {
+                // サーバーから返却されたデータを処理
+                console.log(response.data);
+                const movieList = document.getElementById('movieList');
+                
+                if (Array.isArray(response.data)) {
+                    // 映画リストをHTMLに追加
+                    movieList.innerHTML = '';
+                    response.data.forEach(function (movie) {
+                        const movieItem = document.createElement('div');
+                        
+                        // 動画を表示するための movie タグ
+                        const videoElement = document.createElement('video');
+                        videoElement.setAttribute('controls', ''); // コントロールを表示
+                        videoElement.setAttribute('width', '600'); // 幅を設定
+
+                        const sourceElement = document.createElement('source');
+                        sourceElement.setAttribute('src', movie.movie_url); // APIから取得したURLを設定
+                        sourceElement.setAttribute('type', 'video/mp4'); // 動画形式を指定
+
+                        // video タグに source タグを追加
+                        videoElement.appendChild(sourceElement);
+                        movieItem.appendChild(videoElement);
+                        
+                        // 映画のタイトルを表示
+                        const titleElement = document.createElement('p');
+                        titleElement.textContent = movie.title || "無題"; // タイトルがない場合は「無題」と表示
+                        movieItem.appendChild(titleElement);
+                        
+                        movieList.appendChild(movieItem);
+                    });
+                } else if (response.data.error) {
+                    // エラーメッセージの表示
+                    movieList.textContent = 'Error: ' + response.data.error;
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+                const movieList = document.getElementById('movieList');
+                movieList.textContent = 'Failed to fetch movie list.';
+            });
+        }
+
+        //動画詳細を取得する関数
+        document.getElementById('movie_select').addEventListener('click', function() {
+            const movie_id = document.getElementById('movie_id').value;
+            axios.post('https://devesion.main.jp/jphacks/api/main.php', {
+                get_movie_select: '',  // POSTデータとして送信
+                movie_id: movie_id,
+            },{
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
+            .then(function (response) {
+                // サーバーから返却されたデータを処理
+                console.log(response.data);
+            })
+            .catch(function (error) {
+                console.log(error);
+                const movieList = document.getElementById('movieList');
+                movieList.textContent = 'Failed to fetch movie list.';
+            });
+        });
+
+        // ページロード時に映画リストを取得
+        window.onload = fetchMovieList;
+
+        // ログインフォームの送信イベントを処理
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // フォームのデフォルト動作をキャンセル
+
+            const mail = document.getElementById('mail').value;
+            const pass = document.getElementById('pass').value;
+
+            axios.post('https://devesion.main.jp/jphacks/api/main.php', {
+                login:'',
+                mail: mail,
+                pass: pass
+            },{
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
+            .then(function (response) {
+                console.log(response.data);
+                const movieList = document.getElementById('movieList');
+                if (response.data.login) {
+                    if (response.data.create) {
+                        movieList.textContent = '新しいアカウントが作成されました。';
+                    } else {
+                        movieList.textContent = 'ログインしました。';
+                    }
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+                const movieList = document.getElementById('movieList');
+                movieList.textContent = 'ログインに失敗しました。';
+            });
+        });
+
+        // Vtuberログイン処理
+        document.getElementById('loginVtuberButton').addEventListener('click', function() {
+            console.log("Button clicked");
+
+            const mail = document.getElementById('vlmail').value;
+            const pass = document.getElementById('vlpass').value;
+
+            console.log(mail + pass);
+
+            axios.post('https://devesion.main.jp/jphacks/api/main.php', {
+                login_vtuber: '',
+                mail: mail,
+                pass: pass
+            }, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
+            .then(function (response) {
+                console.log(response.data);
+                // ログイン成功時の処理をここに追加
+            })
+            .catch(function (error) {
+                console.log(error);
+                const movieList = document.getElementById('movieList');
+                movieList.textContent = 'ログインに失敗しました。';
+            });
+        });
+
+
+
+        //Vtuber新規登録処理
+        document.getElementById('createVtuberForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // フォームのデフォルト動作をキャンセル
+
+            const formData = new FormData(this);
+            formData.append('create_vtuber', '');
+
+            axios.post('https://devesion.main.jp/jphacks/api/main.php', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
+            .then(function (response) {
+                console.log(response.data);
+                const movieList = document.getElementById('movieList');
+                if (response.data.login) {
+                    if (response.data.create) {
+                        movieList.textContent = '新しいアカウントが作成されました。';
+                    } else {
+                        movieList.textContent = 'ログインしました。';
+                    }
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+                const movieList = document.getElementById('movieList');
+                movieList.textContent = 'ログインに失敗しました。';
+            });
+        });
+
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // フォームのデフォルト動作をキャンセル
+
+            const formData = new FormData(this);
+            formData.append('post_movie', '');
+            formData.append('channel_id', 1);//ログインしているVtuberの値
+            axios.post('https://devesion.main.jp/jphacks/api/main.php', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
+            .then(function (response) {
+                console.log(response.data);
+                const message = document.getElementById('message');
+                message.textContent = response.data.video_url; // レスポンスメッセージを表示
+            })
+            .catch(function (error) {
+                console.error('Error:', error);
+                const message = document.getElementById('message');
+                message.textContent = 'アップロードに失敗しました。'; // エラーメッセージ
+            });
+        });
+    </script>
+</body>
+</html>
