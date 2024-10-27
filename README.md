@@ -89,10 +89,10 @@ GPUリソースを用いたデプロイも大変なので断念しました。
 結果的に、全てのフローをPyhotnでのAPI経由で完結することができ、高速かつ簡単なデプロイ&運用が実現できました。
 
 ## 開発技術
-フロントエンド・バックエンド: Next.js, React, PHP, Python, Flask
+Next.js, React, PHP, Python, Flask
 
 ### 活用した技術
-サービス・AIモデル: v0, Claude, Vercel
+v0, Claude, Vercel
 
 #### API・データ
 Elevenlabs, OpenAI
