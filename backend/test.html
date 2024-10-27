@@ -10,6 +10,10 @@
 <body>
     <h1>Movie List</h1>
 
+    <label for="movie_id">動画ID:</label>
+    <input type="text" id="movie_id" name="movie_id" required>
+    <button type="button" id="movie_select">ログイン</button>
+
     <!-- メールアドレスとパスワードの入力フォーム -->
     <form id="loginForm">
         <label for="mail">メールアドレス:</label>
@@ -81,6 +85,7 @@
     <div id="movieList"></div>
 
     <script>
+        //動画一覧を取得する関数
         function fetchMovieList() {
             axios.post('https://devesion.main.jp/jphacks/api/main.php', {
                 get_movie_list: ''  // POSTデータとして送信
@@ -131,6 +136,28 @@
                 movieList.textContent = 'Failed to fetch movie list.';
             });
         }
+
+        //動画詳細を取得する関数
+        document.getElementById('movie_select').addEventListener('click', function() {
+            const movie_id = document.getElementById('movie_id').value;
+            axios.post('https://devesion.main.jp/jphacks/api/main.php', {
+                get_movie_select: '',  // POSTデータとして送信
+                movie_id: movie_id,
+            },{
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
+            .then(function (response) {
+                // サーバーから返却されたデータを処理
+                console.log(response.data);
+            })
+            .catch(function (error) {
+                console.log(error);
+                const movieList = document.getElementById('movieList');
+                movieList.textContent = 'Failed to fetch movie list.';
+            });
+        });
 
         // ページロード時に映画リストを取得
         window.onload = fetchMovieList;

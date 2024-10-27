@@ -13,6 +13,7 @@ require_once './login_user.php';
 require_once './postMovie.php';
 require_once './create_vtuber.php';
 require_once './login_vtuber.php';
+require_once './get_movie_select.php';
 
 // 初期データ
 $data = "noooo action";
@@ -35,6 +36,9 @@ if (isset($_POST['get_movie_list']) == true) {
 }else if(isset($_POST['login_vtuber']) == true){
     $class = new LoginVtuber();
     $data = $class->login_vtuber($_POST['mail'],$_POST['pass']);
+}else if(isset($_POST['get_movie_select']) == true){
+    $class = new GetMovieSelect();
+    $data = $class->get_movie_select($_POST['movie_id']);
 }
 
 // arrayの中身をJSON形式に変換して出力
