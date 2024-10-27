@@ -10,6 +10,8 @@ import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [videos, setVideos] = useState<Video[]>([]);
+  const [selectedLanguage, setSelectedLanguage] = useState("japanese");
+  const [filteredVideos, setFilteredVideos] = useState<Video[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -44,16 +46,34 @@ export default function Home() {
     params.append("language", video.language);
     router.push(`/video/${video.movie_id}?${params.toString()}`);
   };
-
+  useEffect(() => {
+    setFilteredVideos(
+      videos.filter((video) => video.language === selectedLanguage)
+    );
+  }, [videos, selectedLanguage]);
+  const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedLanguage(e.target.value);
+  };
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto py-8">
-        <h1 className="text-2xl font-bold mb-6 text-foreground">
-          あなたへのおすすめ
-        </h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-foreground">
+            あなたへのおすすめ
+          </h1>
+          <select
+            value={selectedLanguage}
+            onChange={handleLanguageChange}
+            className="bg-card text-foreground border border-gray-300 rounded-md px-3 py-2"
+          >
+            <option value="japanese">日本語</option>
+            <option value="english">英語</option>
+            {/* 他の言語オプションを必要に応じて追加 */}
+          </select>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
-          {videos.map((video) => (
+          {filteredVideos.map((video) => (
             <button
               onClick={() => handleNavigation(video)}
               key={video.movie_id}

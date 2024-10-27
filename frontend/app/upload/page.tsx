@@ -129,70 +129,72 @@ export default function UploadPage() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto py-8">
-        <h1 className="text-3xl font-bold mb-6">動画を投稿する</h1>
-        <form onSubmit={handleUpload} className="space-y-6 max-w-2xl mx-auto">
-          <div className="space-y-2">
-            <Label htmlFor="thumbnail">サムネイル画像</Label>
-            <div className="flex items-center justify-center w-full">
-              <label
-                htmlFor="thumbnail"
-                className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600 transition duration-300 ease-in-out"
-              >
-                {thumbnail ? (
-                  <div className="relative w-full h-full">
-                    <img
-                      src={URL.createObjectURL(thumbnail)}
-                      alt="Thumbnail preview"
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity duration-300">
-                      <p className="text-white text-sm">クリックして変更</p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <Upload className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" />
-                    <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                      <span className="font-semibold">
-                        クリックしてアップロード
-                      </span>
-                      またはドラッグ＆ドロップ
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      JPEG, PNG, GIF (最大 2MB)
-                    </p>
-                  </div>
-                )}
-                <Input
-                  id="thumbnail"
-                  type="file"
-                  accept="image/jpeg,image/png,image/gif"
-                  className="hidden"
-                  onChange={handleThumbnailChange}
-                  required
-                />
-              </label>
-            </div>
-            {thumbnail && (
-              <div className="flex items-center justify-between p-2 mt-2 bg-gray-100 rounded">
-                <span className="text-sm truncate">{thumbnail.name}</span>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setThumbnail(null)}
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h1 className="text-3xl font-bold mb-6 text-center">動画を投稿する</h1>
+        <form onSubmit={handleUpload} className="space-y-6 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="thumbnail">サムネイル画像</Label>
+              <div className="flex items-center justify-center w-full">
+                <label
+                  htmlFor="thumbnail"
+                  className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600 transition duration-300 ease-in-out"
                 >
-                  <X className="h-4 w-4" />
-                </Button>
+                  {thumbnail ? (
+                    <div className="relative w-full h-full">
+                      <img
+                        src={URL.createObjectURL(thumbnail)}
+                        alt="Thumbnail preview"
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity duration-300">
+                        <p className="text-white text-sm">クリックして変更</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <Upload className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" />
+                      <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                        <span className="font-semibold">
+                          クリックしてアップロード
+                        </span>
+                        またはドラッグ＆ドロップ
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        JPEG, PNG, GIF (最大 2MB)
+                      </p>
+                    </div>
+                  )}
+                  <Input
+                    id="thumbnail"
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif"
+                    className="hidden"
+                    onChange={handleThumbnailChange}
+                    required
+                  />
+                </label>
               </div>
-            )}
+              {thumbnail && (
+                <div className="flex items-center justify-between p-2 mt-2 bg-gray-100 rounded">
+                  <span className="text-sm truncate">{thumbnail.name}</span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setThumbnail(null)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
             <div className="space-y-2">
               <Label htmlFor="file">動画ファイル</Label>
               <div className="flex items-center justify-center w-full">
                 <label
                   htmlFor="file"
-                  className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+                  className="flex flex-col items-center justify-center w-full h-40 md:h-64 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
                 >
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
                     <Upload className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" />
@@ -215,70 +217,54 @@ export default function UploadPage() {
                   />
                 </label>
               </div>
+              {file && (
+                <div className="flex items-center justify-between p-2 mt-2 bg-gray-100 rounded">
+                  <span className="text-sm truncate">{file.name}</span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setFile(null)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
             </div>
-            {file && (
-              <div className="flex items-center justify-between p-2 mt-2 bg-gray-100 rounded">
-                <span className="text-sm truncate">{file.name}</span>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setFile(null)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            )}
           </div>
-          {/* <div className="space-y-2">
-            <Label htmlFor="title">ユーザー名</Label>
-            <Input
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="ユーザー名を入力"
-              required
-            />
-          </div> */}
-          <div className="space-y-2">
-            <Label htmlFor="title">タイトル</Label>
-            <Input
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="タイトルを入力"
-              required
-            />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="title">タイトル</Label>
+              <Input
+                id="title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="タイトルを入力"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="category">カテゴリ</Label>
+              <Select value={category} onValueChange={setCategory}>
+                <SelectTrigger>
+                  <SelectValue placeholder="カテゴリを選択" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="entertainment">
+                    エンターテイメント
+                  </SelectItem>
+                  <SelectItem value="education">教育</SelectItem>
+                  <SelectItem value="sports">スポーツ</SelectItem>
+                  <SelectItem value="technology">テクノロジー</SelectItem>
+                  <SelectItem value="music">音楽</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          {/* <div className="space-y-2">
-            <Label htmlFor="description">説明</Label>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="説明を入力"
-              rows={4}
-            />
-          </div> */}
+
           <div className="space-y-2">
-            <Label htmlFor="category">カテゴリ</Label>
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger>
-                <SelectValue placeholder="カテゴリを選択" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="entertainment">
-                  エンターテイメント
-                </SelectItem>
-                <SelectItem value="education">教育</SelectItem>
-                <SelectItem value="sports">スポーツ</SelectItem>
-                <SelectItem value="technology">テクノロジー</SelectItem>
-                <SelectItem value="music">音楽</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="language">言語</Label>
+            <Label htmlFor="language">翻訳したい言語</Label>
             <Select value={language} onValueChange={setLanguage}>
               <SelectTrigger>
                 <SelectValue placeholder="言語を選択" />
@@ -291,10 +277,11 @@ export default function UploadPage() {
               </SelectContent>
             </Select>
           </div>
+
           <Button
             type="submit"
             disabled={!file || isUploading}
-            className="w-full"
+            className="w-full md:w-auto"
           >
             {isUploading ? "アップロード中..." : "アップロード"}
           </Button>
