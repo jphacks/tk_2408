@@ -10,8 +10,8 @@ import { Input } from "@/components/ui/input";
 import axios from "axios";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("test@gmail.com");
-  const [password, setPassword] = useState("pass");
+  const [email, setEmail] = useState("3848hiro@gmail.com");
+  const [password, setPassword] = useState("123456");
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const [error, setError] = useState("");
