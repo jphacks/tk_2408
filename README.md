@@ -4,7 +4,7 @@
 
 注：現在Flaskプロジェクトをデプロイしていないため、動画のアップロードはできません。
 
-動画翻訳をお試しの際は、[実行手順セクション](https://github.com/jphacks/tk_2408/blob/main/README.md#%E5%AE%9F%E8%A1%8C%E6%89%8B%E9%A0%86)に記載の手順でローカルにサーバーを起動してください。
+動画翻訳をお試しの際は、[実行手順セクション](https://github.com/jphacks/tk_2408/blob/main/README.md#%E5%8B%95%E7%94%BB%E7%BF%BB%E8%A8%B3%E5%AE%9F%E8%A1%8C%E6%89%8B%E9%A0%86)に記載の手順でローカルにサーバーを起動してください。
 
 ![Vany_yoko](https://github.com/user-attachments/assets/9d96905e-6daf-4fe8-a9b9-a9d7ce1eb3cd)
 
