@@ -150,9 +150,9 @@ OpenAI社のAPIを用いることで、タイムスタンプ付きの文字認�
 - 特に力を入れた部分をファイルリンク、または commit_id を記載してください。
 https://github.com/jphacks/tk_2408/issues/6
 
-# 実行手順
+## 動画翻訳実行手順
 
-## Python実行手順
+### Python実行手順
 
 1. `.env`ファイルを作成し、OPENAI_API_KEYとELEVENLABS_API_KEYを記載。
 
@@ -162,13 +162,13 @@ https://github.com/jphacks/tk_2408/issues/6
 
 注意：Elevenlabsの請求アカウントを登録しないと利用できません。
 
-## Flask実行手順
+### Flask実行手順
 
 1. 上記設定後、`python flask_main.py`を実行
 
 2. Webサイト上で動画アップロードすると翻訳される
 
-## Next.js実行手順
+### Next.js実行手順
 
 1. `cd frontend`
 
