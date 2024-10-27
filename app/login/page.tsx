@@ -20,27 +20,42 @@ export default function LoginPage() {
     e.preventDefault();
     setError(""); // エラーをリセット
     try {
-      const response = await axios.post('https://devesion.main.jp/jphacks/api/main.php', {
-        login: '',
-        mail: email,
-        pass: password
-      }, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
+      const response = await axios.post(
+        "https://devesion.main.jp/jphacks/api/main.php",
+        {
+          login: "",
+          mail: email,
+          pass: password,
         },
-      });
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
       const isLogin = response.data.login;
       const isCreate = response.data.create;
+      const userId = response.data.user_id;
+
+      // ユーザーIDをローカルストレージに保存
+      if (userId) {
+        localStorage.setItem("userId", userId);
+      }
+
       if (!isCreate && isLogin) {
         router.push("/");
       } else if (isCreate && !isLogin) {
         router.push("/complete-register");
       } else {
-        setError("ログインに失敗しました。メールアドレスとパスワードを確認してください。");
+        setError(
+          "ログインに失敗しました。メールアドレスとパスワードを確認してください。"
+        );
       }
     } catch (error) {
       console.error("Login error:", error);
-      setError("ログイン中にエラーが発生しました。後でもう一度お試しください。");
+      setError(
+        "ログイン中にエラーが発生しました。後でもう一度お試しください。"
+      );
     }
   };
   return (
@@ -125,7 +140,7 @@ export default function LoginPage() {
               </Link>
             </div>
           </div>
-   
+
           {error && (
             <div className="text-red-500 text-sm text-center">{error}</div>
           )}
