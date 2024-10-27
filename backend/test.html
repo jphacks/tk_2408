@@ -21,8 +21,19 @@
         <button type="submit">ログイン</button>
     </form>
 
+    <h2>Vtuberログイン</h2>
+    <form id="loginVtuberForm">
+        <label for="vlmail">メールアドレス:</label>
+        <input type="email" id="vlmail" name="vlmail" required>
+        <br>
+        <label for="vlpass">パスワード:</label>
+        <input type="password" id="vlpass" name="vlpass" required>
+        <br>
+        <button type="button" id="loginVtuberButton">ログイン</button>
+    </form>
+
     <!-- Vtuberのメールアドレスとパスワードの入力フォーム-->
-    <form id="loginVtuberForm" enctype="multipart/form-data">
+    <form id="createVtuberForm" enctype="multipart/form-data">
         <label for="vmail">メールアドレス:</label>
         <input type="email" id="vmail" name="vmail" required>
         <br>
@@ -158,12 +169,43 @@
             });
         });
 
-        //Vtuberログイン処理
-        document.getElementById('loginVtuberForm').addEventListener('submit', function(event) {
+        // Vtuberログイン処理
+        document.getElementById('loginVtuberButton').addEventListener('click', function() {
+            console.log("Button clicked");
+
+            const mail = document.getElementById('vlmail').value;
+            const pass = document.getElementById('vlpass').value;
+
+            console.log(mail + pass);
+
+            axios.post('https://devesion.main.jp/jphacks/api/main.php', {
+                login_vtuber: '',
+                mail: mail,
+                pass: pass
+            }, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
+            .then(function (response) {
+                console.log(response.data);
+                // ログイン成功時の処理をここに追加
+            })
+            .catch(function (error) {
+                console.log(error);
+                const movieList = document.getElementById('movieList');
+                movieList.textContent = 'ログインに失敗しました。';
+            });
+        });
+
+
+
+        //Vtuber新規登録処理
+        document.getElementById('createVtuberForm').addEventListener('submit', function(event) {
             event.preventDefault(); // フォームのデフォルト動作をキャンセル
 
             const formData = new FormData(this);
-            formData.append('login_vtuber', '');
+            formData.append('create_vtuber', '');
 
             axios.post('https://devesion.main.jp/jphacks/api/main.php', formData, {
                 headers: {
