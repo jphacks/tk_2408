@@ -51,12 +51,6 @@ const Modal: React.FC<ModalProps> = ({
             className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-auto relative overflow-hidden"
           >
             <div className="p-8 flex flex-col items-center text-center">
-              <button
-                onClick={onClose}
-                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100 transition-colors duration-200"
-              >
-                <X size={24} />
-              </button>
               <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
                 {title}
               </h3>
