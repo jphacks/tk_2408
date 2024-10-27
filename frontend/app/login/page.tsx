@@ -8,6 +8,7 @@ import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
+import Image from "next/image";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("test@gmail.com");
@@ -59,26 +60,33 @@ export default function LoginPage() {
     }
   };
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#face56] to-[#00ffff]">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500">
       <div className="max-w-md w-full space-y-8 p-10 bg-background rounded-3xl shadow-2xl transform transition-all hover:scale-105">
-        <div className="text-center">
-          <h2 className="mt-6 text-2xl font-extrabold text-foreground">
+        <div className="flex flex-col items-center">
+          {/* ロゴの追加 */}
+          <Image
+            src="/vany-logo.png" // ロゴのパス
+            alt="YourTube Logo"
+            width={120} // 適宜サイズを調整
+            height={120}
+            className="mb-4" // 下に余白を追加
+            priority
+          />
+          <h2 className="mt-2 text-2xl font-extrabold text-foreground text-center">
             ログイン
           </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div className="relative">
-              <label htmlFor="email-address" className="sr-only">
-                メールアドレス
-              </label>
+              <label htmlFor="email-address" className="sr-only">メールアドレス</label>
               <Input
                 id="email-address"
                 name="email"
                 type="email"
                 autoComplete="email"
                 required
-                className="pl-10"
+                className="pl-10 bg-background text-foreground"
                 placeholder="メールアドレス"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -86,16 +94,14 @@ export default function LoginPage() {
               <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             </div>
             <div className="relative">
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
+              <label htmlFor="password" className="sr-only">パスワード</label>
               <Input
                 id="password"
                 name="password"
                 type={showPassword ? "text" : "password"}
                 autoComplete="current-password"
                 required
-                className="pl-10"
+                className="pl-10 bg-background text-foreground"
                 placeholder="パスワード"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -147,7 +153,7 @@ export default function LoginPage() {
           <div>
             <Button
               type="submit"
-              className="w-full bg-black hover:bg-black/90 text-white font-medium py-3 rounded-full transition-all duration-300 transform hover:scale-105"
+              className="w-full bg-foreground text-background font-medium py-3 rounded-full transition-all duration-300 transform hover:scale-105"
             >
               ログイン
             </Button>
