@@ -23,32 +23,45 @@ export default function RegisterPage() {
     setError(""); // エラーをリセット
     try {
       console.log(email, password);
-      const response = await axios.post('https://devesion.main.jp/jphacks/api/main.php', {
-        login: '',
-        mail: email,
-        pass: password
-      }, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
+      const response = await axios.post(
+        "https://devesion.main.jp/jphacks/api/main.php",
+        {
+          login: "",
+          mail: email,
+          pass: password,
         },
-      });
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
       const isCreate = response.data.create;
       const isLogin = response.data.login;
-      console.log(isCreate);
-      console.log(isLogin);
+      const userId = response.data.user_id;
+
+      // ユーザーIDをローカルストレージに保存
+      if (userId) {
+        localStorage.setItem("userId", userId);
+      }
+
       if (!isCreate && isLogin) {
         setError("すでにアカウントがあります。ログインしてください。");
-        return
+        return;
       }
       if (isCreate && !isLogin) {
         router.push("/complete-register");
       } else {
-        setError("ログインに失敗しました。メールアドレスとパスワードを確認してください。");
+        setError(
+          "新規登録に失敗しました。メールアドレスとパスワードを確認してください。"
+        );
       }
     } catch (error) {
       console.log(error);
       console.error("Login error:", error);
-      setError("ログイン中にエラーが発生しました。後でもう一度お試しください。");
+      setError(
+        "ログイン中にエラーが発生しました。後でもう一度お試しください。"
+      );
     }
   };
 
