@@ -6,7 +6,7 @@ import { Upload, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import Modal from "@/components/Modal";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -27,6 +27,11 @@ export default function UploadPage() {
   const [language, setLanguage] = useState("");
   const [tags, setTags] = useState("");
   const [thumbnail, setThumbnail] = useState<File | null>(null);
+  const [modalState, setModalState] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+  });
   const router = useRouter();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,7 +49,12 @@ export default function UploadPage() {
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file || !thumbnail) {
-      alert("動画ファイルとサムネイル画像の両方をアップロードしてください。");
+      setModalState({
+        isOpen: true,
+        title: "エラー",
+        message:
+          "動画ファイルとサムネイル画像の両方をアップロードしてください。",
+      });
       return;
     }
 
@@ -59,6 +69,19 @@ export default function UploadPage() {
     formData.append("thumbnail", thumbnail);
     formData.append("category", category);
 
+    // localStorageからchannel_idを取得
+    const channelId = localStorage.getItem("channelId");
+    if (!channelId) {
+      setModalState({
+        isOpen: true,
+        title: "エラー",
+        message: "チャンネルIDが見つかりません。ログインしてください。",
+      });
+      setIsUploading(false);
+      return;
+    }
+    formData.append("channel_id", channelId);
+
     try {
       const response = await axios.post(
         "https://devesion.main.jp/jphacks/api/main.php",
@@ -69,21 +92,38 @@ export default function UploadPage() {
           },
         }
       );
-      console.log("Upload response:", response.data);
       if (response.data.error) {
-        alert("エラー: " + response.data.error);
+        setModalState({
+          isOpen: true,
+          title: "エラー",
+          message: "エラー: " + response.data.error,
+        });
       } else if (response.data.success) {
-        alert("アップロード成功！");
-        router.push("/");
+        setModalState({
+          isOpen: true,
+          title: "成功",
+          message: "アップロード成功！",
+        });
       } else {
-        alert("不明なレスポンス。サーバーの応答を確認してください。");
+        setModalState({
+          isOpen: true,
+          title: "警告",
+          message: "不明なレスポンス。サーバーの応答を確認してください。",
+        });
       }
       setIsUploading(false);
     } catch (error) {
       console.error("Upload failed:", error);
-      alert("アップロードに失敗しました。");
+      setModalState({
+        isOpen: true,
+        title: "エラー",
+        message: "アップロードに失敗しました。",
+      });
       setIsUploading(false);
     }
+  };
+  const handleGoHome = () => {
+    router.push("/");
   };
 
   return (
@@ -260,6 +300,18 @@ export default function UploadPage() {
           </Button>
         </form>
       </main>
+      <Modal
+        isOpen={modalState.isOpen}
+        onClose={() => setModalState({ ...modalState, isOpen: false })}
+        title={modalState.title}
+        message={modalState.message}
+      >
+        {modalState.title === "成功" && (
+          <Button onClick={handleGoHome} className="mt-4">
+            ホームへ戻る
+          </Button>
+        )}
+      </Modal>
     </div>
   );
 }
