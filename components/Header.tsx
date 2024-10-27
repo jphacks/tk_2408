@@ -23,23 +23,28 @@ export default function Header() {
     // For now, we'll just redirect to the home page
     router.push("/");
   };
+
+  const handleLogout = () => {
+    localStorage.removeItem("channelId");
+    router.push("/login");
+  };
+
   return (
     <header className="flex items-center justify-between p-4 bg-primary-background border-b">
       <div className="mr-4 hidden md:flex">
         <Link className="mr-6 flex items-center space-x-2" href="/">
           <span className="text-2xl font-bold">YourTube</span>
         </Link>
-        <nav className="flex items-center space-x-6 text-sm font-medium">
+        {/* <nav className="flex items-center space-x-6 text-sm font-medium">
           <Link href="/">ホーム</Link>
           <Link href="/trending">トレンド</Link>
-          {/* <Link href="/subscriptions">購読</Link> */}
-        </nav>
+        </nav> */}
       </div>
       <Button variant="outline" size="icon" className="mr-2 md:hidden">
         <Menu className="h-4 w-4" />
         <span className="sr-only">Toggle Menu</span>
       </Button>
-      <div className="flex flex-10 items-center justify-end space-x-2">
+      {/* <div className="flex flex-10 items-center justify-end space-x-2">
         <form onSubmit={handleSearch} className="w-full max-w-lg">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -52,7 +57,7 @@ export default function Header() {
             />
           </div>
         </form>
-      </div>
+      </div> */}
       <Popover>
         <PopoverTrigger asChild>
           <Button
@@ -107,6 +112,7 @@ export default function Header() {
               <Button
                 variant="outline"
                 className="flex w-full items-center justify-start space-x-2"
+                onClick={handleLogout}
               >
                 <LogOut className="h-4 w-4" />
                 <span>Log out</span>
