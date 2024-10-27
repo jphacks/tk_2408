@@ -160,7 +160,7 @@ https://github.com/jphacks/tk_2408/issues/6
 
 3. `VIDEO_PATH`に入力動画を配置し、`EXTRACTED_AUDIO_PATH`に適当なパスを設定し、`python app.py`を実行すると、その声の翻訳動画が`OUTPUT_MOVIE_PATH`に配置される。
 
-注意：Elevenlabsの請求アカウントを登録しないと利用できません。
+注：Elevenlabsの請求アカウントを登録しないと利用できません。
 
 ### Flask実行手順
 
@@ -186,4 +186,4 @@ https://github.com/jphacks/tk_2408/issues/6
 
 6. 翻訳動画が生成、投稿される
 
-注意：Flaskを実行した状態でないと、動画のアップロード処理が動作しません。
+注：Flaskを実行した状態でないと、動画のアップロード処理が動作しません。
