@@ -11,25 +11,22 @@ import {
   Minimize,
   Maximize,
 } from "lucide-react";
-import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import * as Slider from "@radix-ui/react-slider";
 import screenfull from "screenfull";
-
-const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
+import styles from "./VideoPage.module.css"; // 新しく追加するCSSモジュール
 
 export default function VideoPage() {
-  const [isClient, setIsClient] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(0.8);
   const [muted, setMuted] = useState(false);
-  const [played, setPlayed] = useState(0);
-  const [seeking, setSeeking] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const playerRef = useRef<ReactPlayer>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [showThumbnail, setShowThumbnail] = useState(true);
   const searchParams = useSearchParams();
   const [videoData, setVideoData] = useState({
     title: "",
@@ -43,7 +40,6 @@ export default function VideoPage() {
   const videoContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setIsClient(true);
     setVideoData({
       title: searchParams.get("title") || "",
       movie_url: searchParams.get("movie_url") || "",
@@ -53,10 +49,6 @@ export default function VideoPage() {
       language: searchParams.get("language") || "",
     });
   }, [searchParams]);
-
-  if (!videoData) {
-    return <div>Loading...</div>;
-  }
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -73,35 +65,71 @@ export default function VideoPage() {
       }
     };
   }, []);
-  const handlePlayPause = () => setPlaying(!playing);
-  const handleVolumeChange = (newValue: number[]) => setVolume(newValue[0]);
-  const handleToggleMute = () => setMuted(!muted);
-  const handleSeekChange = (newValue: number[]) => {
-    setPlayed(newValue[0]);
-    setSeeking(true);
+
+  const handlePlayPause = () => {
+    if (showThumbnail) {
+      setShowThumbnail(false);
+      setPlaying(true);
+    } else if (videoRef.current) {
+      if (playing) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setPlaying(!playing);
+    }
   };
 
-  const handleSeekMouseUp = () => {
-    console.log("seeking", played);
-    setSeeking(false);
-    if (playerRef.current) {
-      playerRef.current.seekTo(played, "fraction");
+  useEffect(() => {
+    if (!showThumbnail && videoRef.current) {
+      if (playing) {
+        videoRef.current.play();
+      } else {
+        videoRef.current.pause();
+      }
+    }
+  }, [showThumbnail, playing]);
+
+  const handleVolumeChange = (newValue: number[]) => {
+    const newVolume = newValue[0];
+    setVolume(newVolume);
+    if (videoRef.current) {
+      videoRef.current.volume = newVolume;
     }
   };
-  const handleProgress = (state: { played: number }) => {
-    if (!seeking) {
-      setPlayed(state.played);
+
+  const handleToggleMute = () => {
+    setMuted(!muted);
+    if (videoRef.current) {
+      videoRef.current.muted = !muted;
     }
   };
+
+  const handleSeekChange = (newValue: number[]) => {
+    const newTime = newValue[0];
+    setCurrentTime(newTime);
+    if (videoRef.current) {
+      videoRef.current.currentTime = newTime;
+    }
+  };
+
+  const handleTimeUpdate = () => {
+    if (videoRef.current) {
+      setCurrentTime(videoRef.current.currentTime);
+    }
+  };
+
+  const handleDurationChange = () => {
+    if (videoRef.current) {
+      setDuration(videoRef.current.duration);
+    }
+  };
+
   const handleToggleFullscreen = () => {
     if (videoContainerRef.current && screenfull.isEnabled) {
       screenfull.toggle(videoContainerRef.current);
     }
   };
-  const handleDuration = (duration: number) => {
-    setDuration(duration);
-  };
-
   const formatTime = (seconds: number) => {
     const date = new Date(seconds * 1000);
     const hh = date.getUTCHours();
@@ -112,28 +140,45 @@ export default function VideoPage() {
     }
     return `${mm}:${ss}`;
   };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto py-8">
         <div className="bg-black">
-          <div className="max-w-3xl mx-auto relative">
-            <div ref={videoContainerRef} className="aspect-video relative">
-              <div className="absolute inset-0 flex items-center justify-center">
-                {isClient && (
-                  <ReactPlayer
-                    ref={playerRef}
-                    url={videoData.movie_url}
-                    width="100%"
-                    height="100%"
-                    playing={playing}
-                    volume={volume}
-                    muted={muted}
-                    onProgress={handleProgress}
-                    onDuration={handleDuration}
+          <div className="max-w-4xl mx-auto relative">
+            {" "}
+            {/* ここを変更 */}
+            <div ref={videoContainerRef} className="aspect-video">
+              {" "}
+              {/* アスペクト比を維持 */}
+              {showThumbnail ? (
+                // ... existing code ...
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <img
+                    src={videoData.thumbnail_url}
+                    alt={videoData.title}
+                    className="w-full h-full object-cover"
                   />
-                )}
-              </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute z-10 text-white bg-gradient-to-r from-purple-500 to-pink-500 rounded-full p-8 hover:from-purple-600 hover:to-pink-600 hover:scale-110 transition-all duration-300 shadow-lg"
+                    onClick={handlePlayPause}
+                  >
+                    ▶️
+                  </Button>
+                </div>
+              ) : (
+                // ... existing code ...
+                <video
+                  ref={videoRef}
+                  src={videoData.movie_url}
+                  className="w-full h-full object-cover"
+                  onTimeUpdate={handleTimeUpdate}
+                  onDurationChange={handleDurationChange}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -154,17 +199,16 @@ export default function VideoPage() {
                   )}
                 </Button>
                 <div className="text-white text-sm">
-                  {formatTime(played * duration)} / {formatTime(duration)}
+                  {formatTime(currentTime)} / {formatTime(duration)}
                 </div>
               </div>
               <div className="flex-grow mx-4">
                 <Slider.Root
                   className="relative flex items-center select-none touch-none w-full h-5"
-                  value={[played]}
-                  max={1}
-                  step={0.001}
+                  value={[currentTime]}
+                  max={duration}
+                  step={0.1}
                   onValueChange={handleSeekChange}
-                  onValueCommit={handleSeekMouseUp}
                 >
                   <Slider.Track className="bg-gray-600 relative grow rounded-full h-1">
                     <Slider.Range className="absolute bg-white rounded-full h-full" />
@@ -221,7 +265,7 @@ export default function VideoPage() {
             </div>
           </div>
         </div>
-        <div className="max-w-3xl mx-auto mt-8">
+        <div className="max-w-12xl mx-auto mt-8">
           <h1 className="text-2xl font-bold mb-4">{videoData.title}</h1>
           <div className="flex space-x-2 mb-4">
             <Button variant="outline" size="sm">
