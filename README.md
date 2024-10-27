@@ -2,6 +2,7 @@
 
 作品URL：https://vany.vercel.app/
 発表プレゼンURL：https://www.canva.com/design/DAGUtWS34GM/PYcP7rSeGGyJAEK1N_TNHw/edit?utm_content=DAGUtWS34GM&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
+デモ動画URL：https://www.youtube.com/channel/UCd5zGSqKwh-Or43YOGG8F1g
 
 注：現在Flaskプロジェクトをデプロイしていないため、動画のアップロードはできません。
 
