@@ -196,61 +196,7 @@ export default function VideoPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <div className="flex w-full py-12 px-16">
-        <main className="w-3/5 pr-4">
-          <div className="bg-black">
-            <div className="max-w-full md:max-w-3xl lg:max-w-6xl mx-auto relative">
-              <div ref={videoContainerRef} className="w-full">
-                {showThumbnail ? (
-                  <div className="relative">
-                    <img
-                      src={videoData.thumbnail_url}
-                      alt={videoData.title}
-                      className="w-full h-auto"
-                    />
-                    <Button
-                      variant="ghost"
-                      className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 text-white bg-gradient-to-r from-purple-500 to-pink-500 rounded-md px-6 py-3 lg:px-8 lg:py-4 hover:scale-105 transition-all duration-300"
-                      onClick={handlePlayPause}
-                    >
-                      <Play className="h-6 w-6 lg:h-8 lg:w-8 mr-2" />
-                      Play
-                    </Button>
-                  </div>
-                ) : (
-                  <video
-                    ref={videoRef}
-                    src={videoData.movie_url}
-                    className="w-full h-auto"
-                    onTimeUpdate={handleTimeUpdate}
-                    onDurationChange={handleDurationChange}
-                  />
-                )}
-              </div>
-            </div>
-            <div className="bg-gray-800 w-full">
-              <div className="container mx-auto px-4 py-2">
-                {/* Player controls */}
-                {/* ... */}
-              </div>
-            </div>
-          </div>
-          <div className="max-w-full md:max-w-3xl lg:max-w-6xl mx-auto mt-8 px-4">
-            <h1 className="text-lg md:text-2xl font-bold mb-2">
-              {videoData.title}
-            </h1>
-            <div className="mb-4">
-              <p className="text-sm md:text-base text-muted-foreground">
-                Language: {videoData.language}
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-3 mb-4">
-              {/* Like, Dislike, Share buttons */}
-              {/* ... */}
-            </div>
-          </div>
-        </main>
-  
-        <main className="w-2/5 px-12">
+        <main className="w-full px-12">
           <div className="grid grid-cols-1 gap-6">
             {videos.map((video) => (
               <div
@@ -280,7 +226,7 @@ export default function VideoPage() {
                     )}
                   </div>
                   {/* テキストを右側に配置 */}
-                  <div className="w-1/2 p-4">
+                  <div className="w-1/2 p-10">
                     <h2 className="text-lg font-semibold line-clamp-2 text-foreground">
                       {video.title}
                     </h2>
