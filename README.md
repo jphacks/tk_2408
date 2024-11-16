@@ -199,7 +199,7 @@ OpenAI社のAPIを用いることで、タイムスタンプ付きの文字認�
 
 1. `cd frontend`
 
-2. `npm install`
+2. `yarn`
 
 3. `npx next dev`
 
