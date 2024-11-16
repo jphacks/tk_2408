@@ -26,7 +26,7 @@ export default function Home() {
 
     try {
       const response = await axios.post<{ filename: string }>(
-        "http://127.0.0.1:5000/",
+        "https://flask-app-706273948152.asia-northeast1.run.app/",
         formData,
         {
           headers: {
@@ -56,7 +56,7 @@ export default function Home() {
         <div>
           <h3>処理結果</h3>
           <a
-            href={`http://127.0.0.1:5000/outputs/${result}`}
+            href={`https://flask-app-706273948152.asia-northeast1.run.app/outputs/${result}`}
             target="_blank"
             rel="noopener noreferrer"
           >

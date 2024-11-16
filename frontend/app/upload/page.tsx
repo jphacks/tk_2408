@@ -75,14 +75,17 @@ export default function UploadPage() {
       const flaskFormData = new FormData();
       flaskFormData.append("video", file);
 
-      const flaskResponse = await fetch("http://127.0.0.1:5000/upload", {
-        method: "POST",
-        body: flaskFormData,
-      });
+      const flaskResponse = await fetch(
+        "https://flask-app-706273948152.asia-northeast1.run.app/upload",
+        {
+          method: "POST",
+          body: flaskFormData,
+        }
+      );
 
       if (flaskResponse.ok) {
         const flaskData = await flaskResponse.json();
-        processedVideoUrl = `http://127.0.0.1:5000/download/${flaskData.output_path
+        processedVideoUrl = `https://flask-app-706273948152.asia-northeast1.run.app/download/${flaskData.output_path
           .split("/")
           .pop()}`;
         setProcessedVideoUrl(processedVideoUrl);
