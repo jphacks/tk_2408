@@ -3,39 +3,56 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, UserPlus, Mail, Lock } from "lucide-react";
+import { Eye, EyeOff, UserPlus, Mail, Lock, Image as ImageIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
+
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [displayLanguage, setDisplayLanguage] = useState("en"); // 初期値
+  const [info, setInfo] = useState(""); // 説明フィールド
+  const [thumbnail, setThumbnail] = useState<File | null>(null); // サムネイルファイル
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState(""); // 追加
+  const [error, setError] = useState(""); // エラー
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(""); // エラーをリセット
+
+    if (password !== confirmPassword) {
+      setError("パスワードが一致しません。");
+      return;
+    }
+
     try {
-      console.log(email, password);
+      const formData = new FormData();
+      formData.append("login", "");
+      formData.append("user_name", username);
+      formData.append("mail", email);
+      formData.append("pass", password);
+      formData.append("display_language", displayLanguage);
+      formData.append("info", info);
+      if (thumbnail) {
+        formData.append("thumbnail", thumbnail); // サムネイル画像を追加
+      }
+
       const response = await axios.post(
         "https://devesion.main.jp/jphacks/api/main.php",
-        {
-          login: "",
-          mail: email,
-          pass: password,
-        },
+        formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
           },
         }
       );
+
       const isCreate = response.data.create;
       const isLogin = response.data.login;
       const userId = response.data.user_id;
@@ -52,16 +69,19 @@ export default function RegisterPage() {
       if (isCreate && !isLogin) {
         router.push("/complete-register");
       } else {
+        Array.from(formData.entries()).forEach(([key, value]) => {
+          console.log(key, value);
+        });
+
+        console.log(response.data)
+    
         setError(
           "新規登録に失敗しました。メールアドレスとパスワードを確認してください。"
         );
       }
     } catch (error) {
-      console.log(error);
-      console.error("Login error:", error);
-      setError(
-        "ログイン中にエラーが発生しました。後でもう一度お試しください。"
-      );
+      console.error("Registration error:", error);
+      setError("登録中にエラーが発生しました。後でもう一度お試しください。");
     }
   };
 
@@ -72,28 +92,9 @@ export default function RegisterPage() {
           <h2 className="mt-6 text-2xl font-extrabold text-foreground">
             新規登録
           </h2>
-          {/* <p className="mt-2 text-sm text-muted-foreground">
-            TransTubeアカウントを作成する
-          </p> */}
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
-            {/* <div className="relative">
-              <label htmlFor="username" className="sr-only">
-                ユーザー名
-              </label>
-              <Input
-                id="username"
-                name="username"
-                type="text"
-                required
-                className="pl-10"
-                placeholder="ユーザー名"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
-              <UserPlus className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-            </div> */}
             <div className="relative">
               <label htmlFor="email-address" className="sr-only">
                 メールアドレス
@@ -140,9 +141,6 @@ export default function RegisterPage() {
               </button>
             </div>
             <div className="relative">
-              <label htmlFor="confirm-password" className="sr-only">
-                パスワード確認
-              </label>
               <Input
                 id="confirm-password"
                 name="confirm-password"
@@ -166,6 +164,63 @@ export default function RegisterPage() {
                   <Eye className="h-5 w-5 text-muted-foreground" />
                 )}
               </button>
+            </div>
+            <div className="relative">
+              <label htmlFor="username" className="sr-only">
+                ユーザー名
+              </label>
+              <Input
+                id="username"
+                name="username"
+                type="text"
+                required
+                className="pl-10"
+                placeholder="ユーザー名"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+              <UserPlus className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            </div>
+
+            <div className="relative">
+              <label htmlFor="display-language" className="block">
+                表示言語
+              </label>
+              <select
+                id="display-language"
+                name="display-language"
+                value={displayLanguage}
+                onChange={(e) => setDisplayLanguage(e.target.value)}
+                className="block w-full p-2 border rounded-md text-muted-foreground"
+                required
+              >
+                <option value="en">english</option>
+                <option value="ja">japanese</option>
+              </select>
+            </div>
+            <div className="relative">
+              <textarea
+                id="info"
+                name="info"
+                placeholder="自己紹介や説明"
+                value={info}
+                onChange={(e) => setInfo(e.target.value)}
+                required
+                className="w-full p-3 border rounded-md"
+              ></textarea>
+            </div>
+            <div className="relative">
+              <label htmlFor="thumbnail" className="block">
+                サムネイル画像
+              </label>
+              <input
+                id="thumbnail"
+                name="thumbnail"
+                type="file"
+                accept="image/*"
+                onChange={(e) => setThumbnail(e.target.files?.[0] || null)}
+                className="block mt-4 w-full text-sm text-muted-foreground"
+              />
             </div>
           </div>
           {error && (

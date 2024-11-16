@@ -14,7 +14,8 @@ require_once './postMovie.php';
 require_once './create_vtuber.php';
 require_once './login_vtuber.php';
 require_once './get_movie_select.php';
-
+require_once './add_comment.php';
+require_once './get_comment.php';
 // 初期データ
 $data = "noooo action";
 
@@ -26,7 +27,8 @@ if (isset($_POST['get_movie_list']) == true) {
     $data = $class->get_movie_list();
 }else if (isset($_POST['login']) == true) {
     $class = new UserLogin();
-    $data = $class->login($_POST['mail'],$_POST['pass']);
+    $data = $class->login($_POST['user_name'],$_POST['mail'],$_POST['pass'],isset($_POST['display_language']) ? $_POST['display_language'] : 'japanese', // フロントから受け取った言語設定
+    isset($_POST['info']) ? $_POST['info'] : 'No information provided', $_FILES['thumbnail']);
 }else if (isset($_POST['post_movie']) == true) {
     $videoUpload = new VideoUpload();
     $data = $videoUpload->post_movie($_POST['channel_id'],$_POST['title'],$_POST['language'],$_POST['tags'],$_FILES['thumbnail'],$_FILES['movie']);
@@ -39,6 +41,12 @@ if (isset($_POST['get_movie_list']) == true) {
 }else if(isset($_POST['get_movie_select']) == true){
     $class = new GetMovieSelect();
     $data = $class->get_movie_select($_POST['movie_id']);
+}else if(isset($_POST['add_comment']) == true){
+    $class = new AddComment();
+    $data = $class->add_comment($_POST['user_id'],$_POST['movie_id'],$_POST['comment']);
+}else if(isset($_POST['get_comment']) == true){
+    $class = new GetComment();
+    $data = $class->get_comment($_POST['movie_id']);
 }
 
 // arrayの中身をJSON形式に変換して出力

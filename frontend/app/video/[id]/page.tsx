@@ -22,8 +22,20 @@ import Image from "next/image";
 import axios from "axios";
 import { Video } from "@/types/video";
 
+interface Comment {
+  comment_id: number;
+  comment: string;
+  user_id: string;
+  username: string;
+  icon_url?: string;
+  likes?: number;
+  dislikes?: number;
+  timestamp?: string;
+}
+
 export default function VideoPage() {
   const [videos, setVideos] = useState<Video[]>([]);
+  const [comments, setComments] = useState<Comment[]>([]);
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(0.8);
   const [muted, setMuted] = useState(false);
@@ -43,6 +55,7 @@ export default function VideoPage() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const [comment, setComment] = useState("");
 
   useEffect(() => {
     setVideoData({
@@ -90,6 +103,32 @@ export default function VideoPage() {
 
     fetchVideos();
   }, []);
+
+  useEffect(() => {
+    const videoId = searchParams.get("id") || "";
+    const fetchComments = async () => {
+      try {
+        const response = await axios.post(
+          "https://devesion.main.jp/jphacks/api/main.php",
+          {
+            get_comment: "",
+            movie_id: videoId,
+          },
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        setComments(response.data);
+        console.log(response.data)
+      } catch (error) {
+        console.error("Error fetching videos:", error);
+      }
+    };
+
+    fetchComments();
+  }, [searchParams]);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -189,8 +228,61 @@ export default function VideoPage() {
     params.append("movie_url", video.movie_url);
     params.append("tags", video.tags);
     params.append("language", video.language);
+    params.append("id", video.movie_id);
     router.push(`/video/${video.movie_id}?${params.toString()}`);
   };
+
+  const handleCommentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setComment(e.target.value); // Update state when user types
+  };
+
+  const handleCommentSubmit = async () => {
+    if (!comment.trim()) {
+      alert("Comment cannot be empty.");
+      return;
+    }
+  
+    const userId = localStorage.getItem("userId"); // Retrieve userId from localStorage
+    if (!userId) {
+      alert("User is not logged in. Please log in to comment.");
+      return;
+    }
+    
+    const videoId = searchParams.get("id") || "";
+    console.log(videoId)
+    if (!videoId) {
+      alert("No video selected.");
+      return;
+    }
+  
+    try {
+      console.log(userId)
+      const response = await axios.post(
+        "https://devesion.main.jp/jphacks/api/main.php",
+        {
+          add_comment: "",
+          user_id: userId, // Send userId
+          movie_id: videoId, // Send movie_id
+          comment: comment.trim(), // Send comment
+        },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+  
+      if (response.status === 200) {
+        console.log(response.data);
+        setComment(""); // Clear the input
+      } else {
+        console.error("Failed to add comment:", response);
+      }
+    } catch (error) {
+      console.error("Error adding comment:", error);
+    }
+  };
+  
 
   return (
     <div className="min-h-screen bg-background">
@@ -246,6 +338,76 @@ export default function VideoPage() {
             <div className="flex flex-wrap gap-3 mb-4">
               {/* Like, Dislike, Share buttons */}
               {/* ... */}
+            </div>
+            {/* コメント欄 */}
+            <div className="mt-8">
+              <h2 className="text-xl font-semibold mb-4">コメント({comments.length})</h2>
+              <div className="border-t border-gray-300 py-4">
+                {/* コメント入力欄 */}
+                <div className="flex items-start mb-4">
+                  <img
+                    src="/user-avatar-placeholder.png"
+                    alt="User Avatar"
+                    className="w-10 h-10 rounded-full mr-4"
+                  />
+                  <div className="flex-1">
+                    <textarea
+                      className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-300"
+                      placeholder="Add a public comment..."
+                      rows={2}
+                      value={comment}
+                      onChange={handleCommentChange}
+                    ></textarea>
+                    <div className="flex justify-end mt-2">
+                      <button
+                        className="bg-gray-200 text-gray-700 py-1 px-3 rounded-lg mr-2"
+                        onClick={() => setComment("")}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        className="bg-blue-500 text-white py-1 px-3 rounded-lg"
+                        onClick={handleCommentSubmit}
+                      >
+                        Comment
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* コメントリスト */}
+                {comments.length > 0 ? (
+                  comments.map((commentData, index) => (
+                    <div key={commentData.comment_id || index} className="flex items-start mb-4">
+                      <img
+                        src={commentData.icon_url || "/user-avatar-placeholder.png"}
+                        alt="User Avatar"
+                        className="w-10 h-10 rounded-full mr-4"
+                      />
+                      <div className="flex-1">
+                        <div className="bg-gray-100 p-3 rounded-lg">
+                          <p className="text-sm font-semibold">
+                            {commentData.username || "Anonymous"}
+                          </p>
+                          <p className="text-sm">{commentData.comment}</p>
+                        </div>
+                        <div className="flex items-center mt-2 space-x-4 text-sm text-gray-500">
+                          <button className="flex items-center space-x-1">
+                            <ThumbsUp className="h-4 w-4" />
+                            <span>{commentData.likes || 0}</span>
+                          </button>
+                          <button className="flex items-center space-x-1">
+                            <ThumbsDown className="h-4 w-4" />
+                            <span>{commentData.dislikes || 0}</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500">まだコメントがありません</p>
+                )}
+              </div>
             </div>
           </div>
         </main>

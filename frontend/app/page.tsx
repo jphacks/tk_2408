@@ -44,6 +44,7 @@ export default function Home() {
     params.append("movie_url", video.movie_url);
     params.append("tags", video.tags);
     params.append("language", video.language);
+    params.append("id", video.movie_id);
     router.push(`/video/${video.movie_id}?${params.toString()}`);
   };
 

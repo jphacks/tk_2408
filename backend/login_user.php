@@ -9,7 +9,33 @@ class UserLogin
         return $pdo;
     }
 
-    function login($mail, $pass)
+    public function upload_thumbnail($thumbnailFile)
+    {
+        error_reporting(E_ALL);
+        ini_set('display_errors', 1);
+        
+        // サムネイル画像の保存先
+        $thumbnail_dir = "../icon/";
+        $thumbnail_target_file = $thumbnail_dir . basename($thumbnailFile["name"]);
+        $uploadOk = 1;
+
+        // サムネイル画像ファイルタイプの確認
+        $thumbnailFileType = strtolower(pathinfo($thumbnail_target_file, PATHINFO_EXTENSION));
+        if (!in_array($thumbnailFileType, ['jpg', 'jpeg', 'png', 'gif'])) {
+            echo json_encode(["error" => "申し訳ありませんが、JPG、JPEG、PNG、およびGIFファイルのみが許可されています。"]);
+            return false;
+        }
+
+        // サムネイル画像のアップロードを試みる
+        if (move_uploaded_file($thumbnailFile["tmp_name"], $thumbnail_target_file)) {
+            return "https://devesion.main.jp/jphacks/icon/" . basename($thumbnailFile["name"]); // 完全なURLを返す
+        } else {
+            echo json_encode(["error" => "申し訳ありませんが、サムネイル画像のアップロード中にエラーが発生しました。"]);
+            return false;
+        }
+    }
+
+    function login($user_name, $mail, $pass, $display_language, $info, $thumbnailFile)
     {
         try {
             $pdo = $this->get_pdo();
@@ -25,9 +51,36 @@ class UserLogin
                 return ['login' => true, 'create' => false, 'user_id' => $user['user_id']];
             } else {
                 // ユーザーが存在しない場合、新規作成
-                $insert_sql = "INSERT INTO Users (mail, pass) VALUES (:mail, :pass);";
+
+                // サムネイル画像のアップロード処理
+                $icon_url = "default_icon.png"; // デフォルトのアイコンURL
+                if ($thumbnailFile) {
+                    $uploaded_icon_url = $this->upload_thumbnail($thumbnailFile);
+                    if ($uploaded_icon_url) {
+                        $icon_url = $uploaded_icon_url;
+                    }
+                }
+
+                $insert_sql = "
+                    INSERT INTO Users 
+                    (username, display_language, icon_url, info, gift_level, mail, pass) 
+                    VALUES 
+                    (:username, :display_language, :icon_url, :info, :gift_level, :mail, :pass);
+                ";
                 $insert_stmt = $pdo->prepare($insert_sql);
-                $insert_stmt->execute(['mail' => $mail, 'pass' => $pass]);
+
+                // デフォルト値を設定またはフロントからの値を使用
+                $values = [
+                    'username' => $user_name, // デフォルトのユーザー名
+                    'display_language' => $display_language, // フロントから受け取る
+                    'icon_url' => $icon_url, // サムネイルのURL
+                    'info' => $info, // フロントから受け取る
+                    'gift_level' => 1, // 初期値1
+                    'mail' => $mail,
+                    'pass' => $pass
+                ];
+
+                $insert_stmt->execute($values);
                 
                 // 新しく作成したユーザーのIDを取得
                 $user_id = $pdo->lastInsertId();
