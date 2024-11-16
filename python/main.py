@@ -18,7 +18,6 @@ load_dotenv()
 # 環境変数からAPIキーを取得
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 ELEVENLABS_API_KEY = os.getenv('ELEVENLABS_API_KEY')
-
 # ファイルパスの設定
 UPLOAD_FOLDER = 'uploads/videos'
 EXTRACTED_AUDIO_DIR = 'extracted_audio'
@@ -229,4 +228,5 @@ def download_file(filename):
     return send_file(os.path.join(OUTPUT_DIR, filename), as_attachment=True)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=8080)
+
