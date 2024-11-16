@@ -20,6 +20,8 @@ class GetComment
                     IFNULL(c.user_id, '') AS user_id,
                     IFNULL(c.movie_id, '') AS movie_id,
                     IFNULL(c.comment, '') AS comment,
+                    IFNULL(c.comment_ja, '') AS comment_ja,
+                    IFNULL(c.comment_en, '') AS comment_en,
                     IFNULL(c.timestamp, '') AS timestamp,
                     IFNULL(u.google_id, '') AS google_id,
                     IFNULL(u.username, '') AS username,

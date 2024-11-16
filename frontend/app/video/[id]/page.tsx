@@ -26,6 +26,9 @@ import { Video } from "@/types/video";
 interface Comment {
   comment_id: number;
   comment: string;
+  comment_ja?: string;
+  comment_en?: string;
+  display_language?: string;
   user_id: string;
   username: string;
   icon_url?: string;
@@ -58,6 +61,7 @@ export default function VideoPage() {
   const router = useRouter();
   const [comment, setComment] = useState("");
   const [selectedLanguage, setSelectedLanguage] = useState("all");
+  const [filteredComments, setFilteredComments] = useState<Comment[]>([]);
 
   useEffect(() => {
     setVideoData({
@@ -129,6 +133,35 @@ export default function VideoPage() {
 
     fetchComments();
   }, [searchParams]);
+
+  useEffect(() => {
+    const displayLanguage = localStorage.getItem("displayLanguage") || "all";
+  
+    const filterComments = () => {
+      if (displayLanguage === "all") {
+        setFilteredComments(comments);
+      } else {
+        if(displayLanguage === "japanese"){
+          const filtered = comments.map((comment) => ({
+            ...comment,
+            comment: comment.comment_ja, // comment をそのまま使用。undefined の場合は空文字列
+          }));
+          setFilteredComments(filtered as Comment[]); // 型アサーション
+        }else if(displayLanguage === "english"){
+          const filtered = comments.map((comment) => ({
+            ...comment,
+            comment: comment.comment_en, // comment をそのまま使用。undefined の場合は空文字列
+          }));
+          setFilteredComments(filtered as Comment[]); // 型アサーション
+        }
+      }
+    };
+  
+    filterComments();
+  }, [comments]);
+  
+  
+
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -360,40 +393,45 @@ export default function VideoPage() {
                     </div>
                   </div>
                 </div>
-                {comments.length > 0 ? (
-                  comments.map((commentData, index) => (
-                    <div key={commentData.comment_id || index} className="flex items-start mb-4">
-                      {commentData.icon_url && commentData.icon_url.trim() !== "" ? (
-                        <img
-                          src={commentData.icon_url}
-                          alt={commentData.username || "Anonymous"}
-                          className="w-10 h-10 rounded-full mr-4"
-                        />
-                      ) : (
-                        <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-4">
-                          <User className="text-gray-500 w-6 h-6" />
-                        </div>
-                      )}
-                      <div className="flex-1">
-                        <div className="bg-gray-100 p-3 rounded-lg">
-                          <p className="text-sm font-semibold">
-                            {commentData.username || "Anonymous"}
-                          </p>
-                          <p className="text-sm">{commentData.comment}</p>
-                        </div>
-                        <div className="flex items-center mt-2 space-x-4 text-sm text-gray-500">
-                          <button className="flex items-center space-x-1">
-                            <ThumbsUp className="h-4 w-4" />
-                            <span>{commentData.likes || 0}</span>
-                          </button>
-                          <button className="flex items-center space-x-1">
-                            <ThumbsDown className="h-4 w-4" />
-                            <span>{commentData.dislikes || 0}</span>
-                          </button>
+                {filteredComments.length > 0 ? (
+                  filteredComments.map((commentData, index) => {
+                    // commentData.comment が null または undefined の場合スキップ
+                    if (!commentData.comment) return null;
+
+                    return (
+                      <div key={commentData.comment_id || index} className="flex items-start mb-4">
+                        {commentData.icon_url && commentData.icon_url.trim() !== "" ? (
+                          <img
+                            src={commentData.icon_url}
+                            alt={commentData.username || "Anonymous"}
+                            className="w-10 h-10 rounded-full mr-4"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-4">
+                            <User className="text-gray-500 w-6 h-6" />
+                          </div>
+                        )}
+                        <div className="flex-1">
+                          <div className="bg-gray-100 p-3 rounded-lg">
+                            <p className="text-sm font-semibold">
+                              {commentData.username || "Anonymous"}
+                            </p>
+                            <p className="text-sm">{commentData.comment}</p>
+                          </div>
+                          <div className="flex items-center mt-2 space-x-4 text-sm text-gray-500">
+                            <button className="flex items-center space-x-1">
+                              <ThumbsUp className="h-4 w-4" />
+                              <span>{commentData.likes || 0}</span>
+                            </button>
+                            <button className="flex items-center space-x-1">
+                              <ThumbsDown className="h-4 w-4" />
+                              <span>{commentData.dislikes || 0}</span>
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 ) : (
                   <p className="text-gray-500">まだコメントがありません</p>
                 )}

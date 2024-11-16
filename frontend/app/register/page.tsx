@@ -211,7 +211,7 @@ export default function RegisterPage() {
             </div>
             <div className="relative">
               <label htmlFor="thumbnail" className="block">
-                サムネイル画像
+                アイコン画像
               </label>
               <input
                 id="thumbnail"
