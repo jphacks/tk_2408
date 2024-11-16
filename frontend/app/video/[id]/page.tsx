@@ -10,6 +10,7 @@ import {
   VolumeX,
   Minimize,
   Maximize,
+  User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
@@ -56,6 +57,7 @@ export default function VideoPage() {
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [comment, setComment] = useState("");
+  const [selectedLanguage, setSelectedLanguage] = useState("all");
 
   useEffect(() => {
     setVideoData({
@@ -69,12 +71,10 @@ export default function VideoPage() {
   }, [searchParams]);
 
   useEffect(() => {
-    // Check for userId or vtubeId in localStorage
     const userId = localStorage.getItem("userId");
     const vtubeId = localStorage.getItem("channelId");
 
     if (!userId && !vtubeId) {
-      // Redirect to login page if neither exists
       router.push("/login");
       return;
     }
@@ -95,7 +95,7 @@ export default function VideoPage() {
           }
         );
         setVideos(response.data);
-        console.log(response.data)
+        console.log(response.data);
       } catch (error) {
         console.error("Error fetching videos:", error);
       }
@@ -121,7 +121,7 @@ export default function VideoPage() {
           }
         );
         setComments(response.data);
-        console.log(response.data)
+        console.log(response.data);
       } catch (error) {
         console.error("Error fetching videos:", error);
       }
@@ -233,7 +233,7 @@ export default function VideoPage() {
   };
 
   const handleCommentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setComment(e.target.value); // Update state when user types
+    setComment(e.target.value);
   };
 
   const handleCommentSubmit = async () => {
@@ -241,40 +241,37 @@ export default function VideoPage() {
       alert("Comment cannot be empty.");
       return;
     }
-  
-    const userId = localStorage.getItem("userId"); // Retrieve userId from localStorage
+
+    const userId = localStorage.getItem("userId");
     if (!userId) {
       alert("User is not logged in. Please log in to comment.");
       return;
     }
-    
+
     const videoId = searchParams.get("id") || "";
-    console.log(videoId)
     if (!videoId) {
       alert("No video selected.");
       return;
     }
-  
+
     try {
-      console.log(userId)
       const response = await axios.post(
         "https://devesion.main.jp/jphacks/api/main.php",
         {
           add_comment: "",
-          user_id: userId, // Send userId
-          movie_id: videoId, // Send movie_id
-          comment: comment.trim(), // Send comment
+          user_id: userId,
+          movie_id: videoId,
+          comment: comment.trim(),
         },
         {
           headers: {
             "Content-Type": "multipart/form-data",
-          },
+          }
         }
       );
-  
+
       if (response.status === 200) {
-        console.log(response.data);
-        setComment(""); // Clear the input
+        setComment("");
       } else {
         console.error("Failed to add comment:", response);
       }
@@ -282,7 +279,6 @@ export default function VideoPage() {
       console.error("Error adding comment:", error);
     }
   };
-  
 
   return (
     <div className="min-h-screen bg-background">
@@ -320,10 +316,7 @@ export default function VideoPage() {
               </div>
             </div>
             <div className="bg-gray-800 w-full">
-              <div className="container mx-auto px-4 py-2">
-                {/* Player controls */}
-                {/* ... */}
-              </div>
+              <div className="container mx-auto px-4 py-2" />
             </div>
           </div>
           <div className="max-w-full md:max-w-3xl lg:max-w-6xl mx-auto mt-8 px-4">
@@ -335,21 +328,14 @@ export default function VideoPage() {
                 Language: {videoData.language}
               </p>
             </div>
-            <div className="flex flex-wrap gap-3 mb-4">
-              {/* Like, Dislike, Share buttons */}
-              {/* ... */}
-            </div>
-            {/* コメント欄 */}
+            <div className="flex flex-wrap gap-3 mb-4" />
             <div className="mt-8">
               <h2 className="text-xl font-semibold mb-4">コメント({comments.length})</h2>
               <div className="border-t border-gray-300 py-4">
-                {/* コメント入力欄 */}
                 <div className="flex items-start mb-4">
-                  <img
-                    src="/user-avatar-placeholder.png"
-                    alt="User Avatar"
-                    className="w-10 h-10 rounded-full mr-4"
-                  />
+                  <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-4">
+                    <User className="text-gray-500 w-6 h-6" />
+                  </div>
                   <div className="flex-1">
                     <textarea
                       className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-300"
@@ -374,16 +360,20 @@ export default function VideoPage() {
                     </div>
                   </div>
                 </div>
-
-                {/* コメントリスト */}
                 {comments.length > 0 ? (
                   comments.map((commentData, index) => (
                     <div key={commentData.comment_id || index} className="flex items-start mb-4">
-                      <img
-                        src={commentData.icon_url || "/user-avatar-placeholder.png"}
-                        alt="User Avatar"
-                        className="w-10 h-10 rounded-full mr-4"
-                      />
+                      {commentData.icon_url && commentData.icon_url.trim() !== "" ? (
+                        <img
+                          src={commentData.icon_url}
+                          alt={commentData.username || "Anonymous"}
+                          className="w-10 h-10 rounded-full mr-4"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-4">
+                          <User className="text-gray-500 w-6 h-6" />
+                        </div>
+                      )}
                       <div className="flex-1">
                         <div className="bg-gray-100 p-3 rounded-lg">
                           <p className="text-sm font-semibold">
@@ -411,7 +401,6 @@ export default function VideoPage() {
             </div>
           </div>
         </main>
-  
         <main className="w-2/5 px-12">
           <div className="grid grid-cols-1 gap-6">
             {videos.map((video) => (
@@ -421,7 +410,6 @@ export default function VideoPage() {
                 className="group cursor-pointer"
               >
                 <div className="bg-card rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 flex">
-                  {/* 画像を左側に配置 */}
                   <div className="w-1/2 aspect-video relative">
                     {video.thumbnail_url !== "" && video.thumbnail_url !== "1.png" ? (
                       <Image
@@ -441,7 +429,6 @@ export default function VideoPage() {
                       />
                     )}
                   </div>
-                  {/* テキストを右側に配置 */}
                   <div className="w-1/2 p-4">
                     <h2 className="text-lg font-semibold line-clamp-2 text-foreground">
                       {video.title}
@@ -454,5 +441,5 @@ export default function VideoPage() {
         </main>
       </div>
     </div>
-  );   
+  );
 }
