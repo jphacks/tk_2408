@@ -316,17 +316,18 @@ export default function VideoPage() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <div className="flex w-full py-12 px-16">
-        <main className="w-3/5 pr-4">
+      <div className="flex flex-col lg:flex-row w-full py-12 px-4 md:px-8 lg:px-16 gap-8">
+        {/* メインビデオ表示エリア */}
+        <main className="lg:w-3/5 flex flex-col gap-6">
           <div className="bg-black">
-            <div className="max-w-full md:max-w-3xl lg:max-w-6xl mx-auto relative">
-              <div ref={videoContainerRef} className="w-full">
+            <div className="w-full aspect-video relative">
+              <div ref={videoContainerRef} className="relative w-full h-full">
                 {showThumbnail ? (
-                  <div className="relative">
+                  <div className="relative w-full h-full">
                     <img
                       src={videoData.thumbnail_url}
                       alt={videoData.title}
-                      className="w-full h-auto"
+                      className="w-full h-full object-cover"
                     />
                     <Button
                       variant="ghost"
@@ -341,143 +342,126 @@ export default function VideoPage() {
                   <video
                     ref={videoRef}
                     src={videoData.movie_url}
-                    className="w-full h-auto"
+                    className="w-full h-full object-cover"
                     onTimeUpdate={handleTimeUpdate}
                     onDurationChange={handleDurationChange}
+                    controls
                   />
                 )}
               </div>
             </div>
-            <div className="bg-gray-800 w-full">
-              <div className="container mx-auto px-4 py-2" />
-            </div>
           </div>
-          <div className="max-w-full md:max-w-3xl lg:max-w-6xl mx-auto mt-8 px-4">
-            <h1 className="text-lg md:text-2xl font-bold mb-2">
-              {videoData.title}
-            </h1>
-            <div className="mb-4">
-              <p className="text-sm md:text-base text-muted-foreground">
-                Language: {videoData.language}
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-3 mb-4" />
-            <div className="mt-8">
-              <h2 className="text-xl font-semibold mb-4">コメント({comments.length})</h2>
-              <div className="border-t border-gray-300 py-4">
-                <div className="flex items-start mb-4">
-                  <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-4">
-                    <User className="text-gray-500 w-6 h-6" />
-                  </div>
-                  <div className="flex-1">
-                    <textarea
-                      className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-300"
-                      placeholder="Add a public comment..."
-                      rows={2}
-                      value={comment}
-                      onChange={handleCommentChange}
-                    ></textarea>
-                    <div className="flex justify-end mt-2">
-                      <button
-                        className="bg-gray-200 text-gray-700 py-1 px-3 rounded-lg mr-2"
-                        onClick={() => setComment("")}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        className="bg-blue-500 text-white py-1 px-3 rounded-lg"
-                        onClick={handleCommentSubmit}
-                      >
-                        Comment
-                      </button>
-                    </div>
+          {/* ビデオタイトルと詳細 */}
+          <div className="mt-4">
+            <h1 className="text-lg md:text-2xl font-bold mb-2">{videoData.title}</h1>
+            <p className="text-sm md:text-base text-muted-foreground mb-4">
+              Language: {videoData.language}
+            </p>
+          </div>
+          {/* コメントセクション */}
+          <div className="mt-8">
+            <h2 className="text-xl font-semibold mb-4">コメント({comments.length})</h2>
+            <div className="border-t border-gray-300 py-4">
+              {/* コメント入力 */}
+              <div className="flex items-start mb-4 gap-4">
+                <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
+                  <User className="text-gray-500 w-6 h-6" />
+                </div>
+                <div className="flex-1">
+                  <textarea
+                    className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-300"
+                    placeholder="Add a public comment..."
+                    rows={2}
+                    value={comment}
+                    onChange={handleCommentChange}
+                  ></textarea>
+                  <div className="flex justify-end mt-2 gap-2">
+                    <button
+                      className="bg-gray-200 text-gray-700 py-1 px-3 rounded-lg"
+                      onClick={() => setComment("")}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="bg-blue-500 text-white py-1 px-3 rounded-lg"
+                      onClick={handleCommentSubmit}
+                    >
+                      Comment
+                    </button>
                   </div>
                 </div>
-                {filteredComments.length > 0 ? (
-                  filteredComments.map((commentData, index) => {
-                    // commentData.comment が null または undefined の場合スキップ
-                    if (!commentData.comment) return null;
-
-                    return (
-                      <div key={commentData.comment_id || index} className="flex items-start mb-4">
-                        {commentData.icon_url && commentData.icon_url.trim() !== "" ? (
-                          <img
-                            src={commentData.icon_url}
-                            alt={commentData.username || "Anonymous"}
-                            className="w-10 h-10 rounded-full mr-4"
-                          />
-                        ) : (
-                          <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-4">
-                            <User className="text-gray-500 w-6 h-6" />
-                          </div>
-                        )}
-                        <div className="flex-1">
-                          <div className="bg-gray-100 p-3 rounded-lg">
-                            <p className="text-sm font-semibold">
-                              {commentData.username || "Anonymous"}
-                            </p>
-                            <p className="text-sm">{commentData.comment}</p>
-                          </div>
-                          <div className="flex items-center mt-2 space-x-4 text-sm text-gray-500">
-                            <button className="flex items-center space-x-1">
-                              <ThumbsUp className="h-4 w-4" />
-                              <span>{commentData.likes || 0}</span>
-                            </button>
-                            <button className="flex items-center space-x-1">
-                              <ThumbsDown className="h-4 w-4" />
-                              <span>{commentData.dislikes || 0}</span>
-                            </button>
-                          </div>
+              </div>
+              {/* コメントリスト */}
+              {filteredComments.length > 0 ? (
+                filteredComments.map((commentData, index) => (
+                  commentData.comment && (
+                    <div key={commentData.comment_id || index} className="flex items-start mb-4">
+                      {commentData.icon_url ? (
+                        <img
+                          src={commentData.icon_url}
+                          alt={commentData.username || "Anonymous"}
+                          className="w-10 h-10 rounded-full mr-4"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-4">
+                          <User className="text-gray-500 w-6 h-6" />
+                        </div>
+                      )}
+                      <div className="flex-1">
+                        <div className="bg-gray-100 p-3 rounded-lg">
+                          <p className="text-sm font-semibold">
+                            {commentData.username || "Anonymous"}
+                          </p>
+                          <p className="text-sm">{commentData.comment}</p>
+                        </div>
+                        <div className="flex items-center mt-2 space-x-4 text-sm text-gray-500">
+                          <button className="flex items-center space-x-1">
+                            <ThumbsUp className="h-4 w-4" />
+                            <span>{commentData.likes || 0}</span>
+                          </button>
+                          <button className="flex items-center space-x-1">
+                            <ThumbsDown className="h-4 w-4" />
+                            <span>{commentData.dislikes || 0}</span>
+                          </button>
                         </div>
                       </div>
-                    );
-                  })
-                ) : (
-                  <p className="text-gray-500">まだコメントがありません</p>
-                )}
-              </div>
+                    </div>
+                  )
+                ))
+              ) : (
+                <p className="text-gray-500">まだコメントがありません</p>
+              )}
             </div>
           </div>
         </main>
-        <main className="w-2/5 px-12">
-          <div className="grid grid-cols-1 gap-6">
-            {videos.map((video) => (
-              <div
-                key={video.movie_id}
-                onClick={() => handleNavigation(video)}
-                className="group cursor-pointer"
-              >
-                <div className="bg-card rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 flex">
-                  <div className="w-1/2 aspect-video relative">
-                    {video.thumbnail_url !== "" && video.thumbnail_url !== "1.png" ? (
-                      <Image
-                        src={video.thumbnail_url}
-                        alt={video.title}
-                        layout="fill"
-                        objectFit="cover"
-                        className="transition-transform group-hover:scale-110"
-                      />
-                    ) : (
-                      <Image
-                        src="/thumb1.jpg"
-                        alt={video.title}
-                        layout="fill"
-                        objectFit="cover"
-                        className="transition-transform group-hover:scale-110"
-                      />
-                    )}
-                  </div>
-                  <div className="w-1/2 p-4">
-                    <h2 className="text-lg font-semibold line-clamp-2 text-foreground">
-                      {video.title}
-                    </h2>
-                  </div>
+        {/* サイドバー（関連動画リスト） */}
+        <aside className="lg:w-2/5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6">
+          {videos.map((video) => (
+            <div
+              key={video.movie_id}
+              onClick={() => handleNavigation(video)}
+              className="group cursor-pointer"
+            >
+              <div className="bg-card rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 flex">
+                <div className="w-1/2 aspect-video relative">
+                  <Image
+                    src={video.thumbnail_url || "/thumb1.jpg"}
+                    alt={video.title}
+                    layout="fill"
+                    objectFit="cover"
+                    className="transition-transform group-hover:scale-110"
+                  />
+                </div>
+                <div className="w-1/2 p-4">
+                  <h2 className="text-sm font-semibold line-clamp-2 text-foreground">
+                    {video.title}
+                  </h2>
                 </div>
               </div>
-            ))}
-          </div>
-        </main>
+            </div>
+          ))}
+        </aside>
       </div>
     </div>
-  );
+  );  
 }
