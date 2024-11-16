@@ -37,12 +37,16 @@ export default function LoginPage() {
       const isLogin = response.data.login;
       const isCreate = response.data.create;
       const userId = response.data.user_id;
-
-      // ユーザーIDをローカルストレージに保存
+      const displayLanguage = response.data.display_language; // display_languageを取得
+  
+      // ユーザーIDと表示言語をローカルストレージに保存
       if (userId) {
         localStorage.setItem("userId", userId);
       }
-
+      if (displayLanguage) {
+        localStorage.setItem("displayLanguage", displayLanguage);
+      }
+  
       if (!isCreate && isLogin) {
         router.push("/");
       } else if (isCreate && !isLogin) {
@@ -59,6 +63,7 @@ export default function LoginPage() {
       );
     }
   };
+  
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500">
       <div className="max-w-md w-full space-y-8 p-10 bg-background rounded-3xl shadow-2xl transform transition-all hover:scale-105">

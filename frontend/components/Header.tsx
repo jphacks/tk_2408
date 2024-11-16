@@ -1,32 +1,66 @@
 import Link from "next/link";
 import { LogOut, Menu, Search, Settings, Upload, User } from "lucide-react";
-
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import axios from "axios";
 
 export default function Header() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [userIcon, setUserIcon] = useState("/placeholder-user.jpg"); // 初期値をプレースホルダーに設定
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        // ローカルストレージから userId を取得
+        const userId = localStorage.getItem("userId");
+
+        if (!userId) {
+          console.error("User ID not found in localStorage");
+          return;
+        }
+
+        // API 呼び出し
+        const response = await axios.post(
+          "https://devesion.main.jp/jphacks/api/main.php",
+          {
+            get_user: "",
+            user_id: userId, // ローカルストレージから取得した userId を送信
+          },
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        const userData = response.data;
+        console.log(userData.icon_url)
+        if (userData && userData.icon_url) {
+          setUserIcon(userData.icon_url); // アイコン URL を状態に設定
+        }
+      } catch (error) {
+        console.error("Error fetching user info:", error);
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // Implement search functionality here
     console.log("Searching for:", searchQuery);
-    // For now, we'll just redirect to the home page
-    router.push("/");
+    router.push(`/result?query=${encodeURIComponent(searchQuery)}`);
   };
 
   const handleLogout = () => {
     localStorage.removeItem("channelId");
+    localStorage.removeItem("userId"); // ログアウト時に userId も削除
     router.push("/login");
   };
 
@@ -42,25 +76,23 @@ export default function Header() {
             priority
           />
         </Link>
-        {/* <nav className="flex items-center space-x-6 text-sm font-medium">
-          <Link href="/">ホーム</Link>
-          <Link href="/trending">トレンド</Link>
-        </nav> */}
       </div>
-      {/* <div className="flex flex-10 items-center justify-end space-x-2">
-        <form onSubmit={handleSearch} className="w-full max-w-lg">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search videos..."
-              className="w-full bg-background pl-8 sm:w-[300px] md:w-[400px] lg:w-[500px]"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
+
+      <div className="flex items-center justify-center w-full max-w-md mx-auto">
+        <form onSubmit={handleSearch} className="flex items-center space-x-2">
+          <Input
+            type="search"
+            placeholder="Search videos..."
+            className="bg-background pl-8 sm:w-[200px] md:w-[300px] lg:w-[400px]"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <Button type="submit" className="p-2">
+            <Search className="h-4 w-4" />
+          </Button>
         </form>
-      </div> */}
+      </div>
+
       <Popover>
         <PopoverTrigger asChild>
           <Button
@@ -70,7 +102,7 @@ export default function Header() {
           >
             <Avatar className="h-8 w-8 ring-1 ring-primary ring-offset-2 ring-offset-background transition-all duration-300 hover:scale-110">
               <AvatarImage
-                src="/placeholder-user.jpg"
+                src={userIcon} // 状態から動的にアイコン URL を設定
                 alt="@username"
                 className="object-cover"
               />
@@ -80,33 +112,7 @@ export default function Header() {
         </PopoverTrigger>
         <PopoverContent className="w-56" align="end" forceMount>
           <div className="grid gap-4">
-            {/* <div className="flex items-center gap-4">
-              <Avatar className="h-10 w-10">
-                <AvatarImage src="/placeholder-user.jpg" alt="@username" />
-                <AvatarFallback>UN</AvatarFallback>
-              </Avatar>
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">username</p>
-                <p className="text-xs leading-none text-muted-foreground">
-                  user@example.com
-                </p>
-              </div>
-            </div> */}
             <div className="grid gap-2">
-              {/* <Link
-                href="/channel-settings"
-                className="flex w-full items-center space-x-2 hover:bg-accent hover:text-accent-foreground rounded-md p-2 text-sm transition-colors"
-              >
-                <Settings className="h-4 w-4" />
-                <span>Channel Settings</span>
-              </Link> */}
-              {/* <Link
-                href="/account-settings"
-                className="flex w-full items-center space-x-2 hover:bg-accent hover:text-accent-foreground rounded-md p-2 text-sm transition-colors"
-              >
-                <User className="h-4 w-4" />
-                <span>Account Settings</span>
-              </Link> */}
               <Link
                 href="/upload"
                 className="flex w-full items-center space-x-2 hover:bg-accent hover:text-accent-foreground rounded-md p-2 text-sm transition-colors"

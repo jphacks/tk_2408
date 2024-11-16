@@ -19,7 +19,7 @@ export default function RegisterCompletePage() {
         </div>
         <div className="mt-8 space-y-6">
           <p className="text-center text-muted-foreground">
-            ようこそ！ TransTubeをお楽しみください。
+            ようこそ！ Vanyをお楽しみください。
           </p>
           <div>
             <Link href="/">

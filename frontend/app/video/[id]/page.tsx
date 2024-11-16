@@ -10,6 +10,7 @@ import {
   VolumeX,
   Minimize,
   Maximize,
+  User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
@@ -18,8 +19,27 @@ import { useSearchParams } from "next/navigation";
 import * as Slider from "@radix-ui/react-slider";
 import screenfull from "screenfull";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import axios from "axios";
+import { Video } from "@/types/video";
+
+interface Comment {
+  comment_id: number;
+  comment: string;
+  comment_ja?: string;
+  comment_en?: string;
+  display_language?: string;
+  user_id: string;
+  username: string;
+  icon_url?: string;
+  likes?: number;
+  dislikes?: number;
+  timestamp?: string;
+}
 
 export default function VideoPage() {
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [comments, setComments] = useState<Comment[]>([]);
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(0.8);
   const [muted, setMuted] = useState(false);
@@ -39,6 +59,9 @@ export default function VideoPage() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const [comment, setComment] = useState("");
+  const [selectedLanguage, setSelectedLanguage] = useState("all");
+  const [filteredComments, setFilteredComments] = useState<Comment[]>([]);
 
   useEffect(() => {
     setVideoData({
@@ -52,16 +75,93 @@ export default function VideoPage() {
   }, [searchParams]);
 
   useEffect(() => {
-    // Check for userId or vtubeId in localStorage
     const userId = localStorage.getItem("userId");
     const vtubeId = localStorage.getItem("channelId");
 
     if (!userId && !vtubeId) {
-      // Redirect to login page if neither exists
       router.push("/login");
       return;
     }
   }, [router]);
+
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const response = await axios.post(
+          "https://devesion.main.jp/jphacks/api/main.php",
+          {
+            get_movie_list: "",
+          },
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        setVideos(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.error("Error fetching videos:", error);
+      }
+    };
+
+    fetchVideos();
+  }, []);
+
+  useEffect(() => {
+    const videoId = searchParams.get("id") || "";
+    const fetchComments = async () => {
+      try {
+        const response = await axios.post(
+          "https://devesion.main.jp/jphacks/api/main.php",
+          {
+            get_comment: "",
+            movie_id: videoId,
+          },
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        setComments(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.error("Error fetching videos:", error);
+      }
+    };
+
+    fetchComments();
+  }, [searchParams]);
+
+  useEffect(() => {
+    const displayLanguage = localStorage.getItem("displayLanguage") || "all";
+  
+    const filterComments = () => {
+      if (displayLanguage === "all") {
+        setFilteredComments(comments);
+      } else {
+        if(displayLanguage === "japanese"){
+          const filtered = comments.map((comment) => ({
+            ...comment,
+            comment: comment.comment_ja, // comment をそのまま使用。undefined の場合は空文字列
+          }));
+          setFilteredComments(filtered as Comment[]); // 型アサーション
+        }else if(displayLanguage === "english"){
+          const filtered = comments.map((comment) => ({
+            ...comment,
+            comment: comment.comment_en, // comment をそのまま使用。undefined の場合は空文字列
+          }));
+          setFilteredComments(filtered as Comment[]); // 型アサーション
+        }
+      }
+    };
+  
+    filterComments();
+  }, [comments]);
+  
+  
+
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -154,149 +254,230 @@ export default function VideoPage() {
     return `${mm}:${ss}`;
   };
 
+  const handleNavigation = (video: Video) => {
+    const params = new URLSearchParams();
+    params.append("title", video.title);
+    params.append("thumbnail_url", video.thumbnail_url);
+    params.append("movie_url", video.movie_url);
+    params.append("tags", video.tags);
+    params.append("language", video.language);
+    params.append("id", video.movie_id);
+    router.push(`/video/${video.movie_id}?${params.toString()}`);
+  };
+
+  const handleCommentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setComment(e.target.value);
+  };
+
+  const handleCommentSubmit = async () => {
+    if (!comment.trim()) {
+      alert("Comment cannot be empty.");
+      return;
+    }
+
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      alert("User is not logged in. Please log in to comment.");
+      return;
+    }
+
+    const videoId = searchParams.get("id") || "";
+    if (!videoId) {
+      alert("No video selected.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "https://devesion.main.jp/jphacks/api/main.php",
+        {
+          add_comment: "",
+          user_id: userId,
+          movie_id: videoId,
+          comment: comment.trim(),
+        },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        setComment("");
+      } else {
+        console.error("Failed to add comment:", response);
+      }
+    } catch (error) {
+      console.error("Error adding comment:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto w-full md:w-10/12 lg:w-8/12 py-4 px-4">
-        <div className="bg-black">
-          <div className="max-w-full md:max-w-3xl lg:max-w-6xl mx-auto relative">
-            <div ref={videoContainerRef} className="w-full">
-              {showThumbnail ? (
-                <div className="relative">
-                  <img
-                    src={videoData.thumbnail_url}
-                    alt={videoData.title}
-                    className="w-full h-auto"
-                  />
-                  <Button
-                    variant="ghost"
-                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 text-white bg-gradient-to-r from-purple-500 to-pink-500 rounded-md px-6 py-3 lg:px-8 lg:py-4 hover:scale-105 transition-all duration-300"
-                    onClick={handlePlayPause}
-                  >
-                    <Play className="h-6 w-6 lg:h-8 lg:w-8 mr-2" />
-                    Play
-                  </Button>
-                </div>
-              ) : (
-                <video
-                  ref={videoRef}
-                  src={videoData.movie_url}
-                  className="w-full h-auto"
-                  onTimeUpdate={handleTimeUpdate}
-                  onDurationChange={handleDurationChange}
-                />
-              )}
-            </div>
-          </div>
-          <div className="bg-gray-800 w-full">
-            <div className="container mx-auto px-4 py-2">
-              <div className="flex flex-col sm:flex-row items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-white hover:text-primary transition-colors"
-                    onClick={handlePlayPause}
-                  >
-                    {playing ? (
-                      <Pause className="h-6 w-6" />
-                    ) : (
-                      <Play className="h-6 w-6" />
-                    )}
-                  </Button>
-                  <div className="text-white text-xs sm:text-sm">
-                    {formatTime(currentTime)} / {formatTime(duration)}
-                  </div>
-                </div>
-                <div className="w-full sm:flex-grow mx-4 my-2 sm:my-0">
-                  <Slider.Root
-                    className="relative flex items-center select-none touch-none w-full h-5"
-                    value={[currentTime]}
-                    max={duration}
-                    step={0.1}
-                    onValueChange={handleSeekChange}
-                  >
-                    <Slider.Track className="bg-gray-600 relative grow rounded-full h-1">
-                      <Slider.Range className="absolute bg-white rounded-full h-full" />
-                    </Slider.Track>
-                    <Slider.Thumb
-                      className="block w-4 h-4 bg-white rounded-full focus:outline-none"
-                      aria-label="Seek"
+      <div className="flex w-full py-12 px-16">
+        <main className="w-3/5 pr-4">
+          <div className="bg-black">
+            <div className="max-w-full md:max-w-3xl lg:max-w-6xl mx-auto relative">
+              <div ref={videoContainerRef} className="w-full">
+                {showThumbnail ? (
+                  <div className="relative">
+                    <img
+                      src={videoData.thumbnail_url}
+                      alt={videoData.title}
+                      className="w-full h-auto"
                     />
-                  </Slider.Root>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-2">
                     <Button
                       variant="ghost"
-                      size="icon"
-                      className="text-white hover:text-primary transition-colors"
-                      onClick={handleToggleMute}
+                      className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 text-white bg-gradient-to-r from-purple-500 to-pink-500 rounded-md px-6 py-3 lg:px-8 lg:py-4 hover:scale-105 transition-all duration-300"
+                      onClick={handlePlayPause}
                     >
-                      {muted ? (
-                        <VolumeX className="h-6 w-6" />
-                      ) : (
-                        <Volume2 className="h-6 w-6" />
-                      )}
+                      <Play className="h-6 w-6 lg:h-8 lg:w-8 mr-2" />
+                      Play
                     </Button>
-                    <Slider.Root
-                      className="relative flex items-center select-none touch-none w-16 sm:w-24 h-5"
-                      value={[muted ? 0 : volume]}
-                      max={1}
-                      step={0.1}
-                      onValueChange={handleVolumeChange}
-                    >
-                      <Slider.Track className="bg-gray-600 relative grow rounded-full h-1">
-                        <Slider.Range className="absolute bg-white rounded-full h-full" />
-                      </Slider.Track>
-                      <Slider.Thumb
-                        className="block w-4 h-4 bg-white rounded-full focus:outline-none"
-                        aria-label="Volume"
-                      />
-                    </Slider.Root>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-white hover:text-primary transition-colors"
-                    onClick={handleToggleFullscreen}
-                  >
-                    {isFullscreen ? (
-                      <Minimize className="h-6 w-6" />
-                    ) : (
-                      <Maximize className="h-6 w-6" />
-                    )}
-                  </Button>
+                ) : (
+                  <video
+                    ref={videoRef}
+                    src={videoData.movie_url}
+                    className="w-full h-auto"
+                    onTimeUpdate={handleTimeUpdate}
+                    onDurationChange={handleDurationChange}
+                  />
+                )}
+              </div>
+            </div>
+            <div className="bg-gray-800 w-full">
+              <div className="container mx-auto px-4 py-2" />
+            </div>
+          </div>
+          <div className="max-w-full md:max-w-3xl lg:max-w-6xl mx-auto mt-8 px-4">
+            <h1 className="text-lg md:text-2xl font-bold mb-2">
+              {videoData.title}
+            </h1>
+            <div className="mb-4">
+              <p className="text-sm md:text-base text-muted-foreground">
+                Language: {videoData.language}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3 mb-4" />
+            <div className="mt-8">
+              <h2 className="text-xl font-semibold mb-4">コメント({comments.length})</h2>
+              <div className="border-t border-gray-300 py-4">
+                <div className="flex items-start mb-4">
+                  <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-4">
+                    <User className="text-gray-500 w-6 h-6" />
+                  </div>
+                  <div className="flex-1">
+                    <textarea
+                      className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-300"
+                      placeholder="Add a public comment..."
+                      rows={2}
+                      value={comment}
+                      onChange={handleCommentChange}
+                    ></textarea>
+                    <div className="flex justify-end mt-2">
+                      <button
+                        className="bg-gray-200 text-gray-700 py-1 px-3 rounded-lg mr-2"
+                        onClick={() => setComment("")}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        className="bg-blue-500 text-white py-1 px-3 rounded-lg"
+                        onClick={handleCommentSubmit}
+                      >
+                        Comment
+                      </button>
+                    </div>
+                  </div>
                 </div>
+                {filteredComments.length > 0 ? (
+                  filteredComments.map((commentData, index) => {
+                    // commentData.comment が null または undefined の場合スキップ
+                    if (!commentData.comment) return null;
+
+                    return (
+                      <div key={commentData.comment_id || index} className="flex items-start mb-4">
+                        {commentData.icon_url && commentData.icon_url.trim() !== "" ? (
+                          <img
+                            src={commentData.icon_url}
+                            alt={commentData.username || "Anonymous"}
+                            className="w-10 h-10 rounded-full mr-4"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-4">
+                            <User className="text-gray-500 w-6 h-6" />
+                          </div>
+                        )}
+                        <div className="flex-1">
+                          <div className="bg-gray-100 p-3 rounded-lg">
+                            <p className="text-sm font-semibold">
+                              {commentData.username || "Anonymous"}
+                            </p>
+                            <p className="text-sm">{commentData.comment}</p>
+                          </div>
+                          <div className="flex items-center mt-2 space-x-4 text-sm text-gray-500">
+                            <button className="flex items-center space-x-1">
+                              <ThumbsUp className="h-4 w-4" />
+                              <span>{commentData.likes || 0}</span>
+                            </button>
+                            <button className="flex items-center space-x-1">
+                              <ThumbsDown className="h-4 w-4" />
+                              <span>{commentData.dislikes || 0}</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <p className="text-gray-500">まだコメントがありません</p>
+                )}
               </div>
             </div>
           </div>
-        </div>
-        <div className="max-w-full md:max-w-3xl lg:max-w-6xl mx-auto mt-8 px-4">
-          <h1 className="text-lg md:text-2xl font-bold mb-2">
-            {videoData.title}
-          </h1>
-          <div className="mb-4">
-            <p className="text-sm md:text-base text-muted-foreground">
-              Language: {videoData.language}
-            </p>
+        </main>
+        <main className="w-2/5 px-12">
+          <div className="grid grid-cols-1 gap-6">
+            {videos.map((video) => (
+              <div
+                key={video.movie_id}
+                onClick={() => handleNavigation(video)}
+                className="group cursor-pointer"
+              >
+                <div className="bg-card rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 flex">
+                  <div className="w-1/2 aspect-video relative">
+                    {video.thumbnail_url !== "" && video.thumbnail_url !== "1.png" ? (
+                      <Image
+                        src={video.thumbnail_url}
+                        alt={video.title}
+                        layout="fill"
+                        objectFit="cover"
+                        className="transition-transform group-hover:scale-110"
+                      />
+                    ) : (
+                      <Image
+                        src="/thumb1.jpg"
+                        alt={video.title}
+                        layout="fill"
+                        objectFit="cover"
+                        className="transition-transform group-hover:scale-110"
+                      />
+                    )}
+                  </div>
+                  <div className="w-1/2 p-4">
+                    <h2 className="text-lg font-semibold line-clamp-2 text-foreground">
+                      {video.title}
+                    </h2>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="flex flex-wrap gap-3 mb-4">
-            <Button variant="outline" size="sm" className="flex-grow sm:flex-grow-0">
-              <ThumbsUp className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-              <span className="hidden sm:inline">Like</span>
-            </Button>
-            <Button variant="outline" size="sm" className="flex-grow sm:flex-grow-0">
-              <ThumbsDown className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-              <span className="hidden sm:inline">Dislike</span>
-            </Button>
-            <Button variant="outline" size="sm" className="flex-grow sm:flex-grow-0">
-              <Share2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-              <span className="hidden sm:inline">Share</span>
-            </Button>
-          </div>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }
