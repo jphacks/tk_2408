@@ -108,60 +108,57 @@ export default function VideoPage() {
     fetchVideos();
   }, []);
 
-  useEffect(() => {
+  const fetchComments = async () => {
     const videoId = searchParams.get("id") || "";
-    const fetchComments = async () => {
-      try {
-        const response = await axios.post(
-          "https://devesion.main.jp/jphacks/api/main.php",
-          {
-            get_comment: "",
-            movie_id: videoId,
+    try {
+      const response = await axios.post(
+        "https://devesion.main.jp/jphacks/api/main.php",
+        {
+          get_comment: "",
+          movie_id: videoId,
+        },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
           },
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-        setComments(response.data);
-        console.log(response.data);
-      } catch (error) {
-        console.error("Error fetching videos:", error);
-      }
-    };
+        }
+      );
+      setComments(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+    }
+  };
 
+  useEffect(() => {
     fetchComments();
   }, [searchParams]);
 
   useEffect(() => {
     const displayLanguage = localStorage.getItem("displayLanguage") || "all";
-  
+
     const filterComments = () => {
       if (displayLanguage === "all") {
         setFilteredComments(comments);
       } else {
-        if(displayLanguage === "japanese"){
+        if (displayLanguage === "japanese") {
           const filtered = comments.map((comment) => ({
             ...comment,
-            comment: comment.comment_ja, // comment をそのまま使用。undefined の場合は空文字列
+            comment: comment.comment_ja,
           }));
-          setFilteredComments(filtered as Comment[]); // 型アサーション
-        }else if(displayLanguage === "english"){
+          setFilteredComments(filtered as Comment[]);
+        } else if (displayLanguage === "english") {
           const filtered = comments.map((comment) => ({
             ...comment,
-            comment: comment.comment_en, // comment をそのまま使用。undefined の場合は空文字列
+            comment: comment.comment_en,
           }));
-          setFilteredComments(filtered as Comment[]); // 型アサーション
+          setFilteredComments(filtered as Comment[]);
         }
       }
     };
-  
+
     filterComments();
   }, [comments]);
-  
-  
-
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -271,19 +268,19 @@ export default function VideoPage() {
 
   const handleCommentSubmit = async () => {
     if (!comment.trim()) {
-      alert("Comment cannot be empty.");
+      alert("コメントを入力してください。");
       return;
     }
 
     const userId = localStorage.getItem("userId");
     if (!userId) {
-      alert("User is not logged in. Please log in to comment.");
+      alert("ログインしてください。");
       return;
     }
 
     const videoId = searchParams.get("id") || "";
     if (!videoId) {
-      alert("No video selected.");
+      alert("ビデオが選択されていません。");
       return;
     }
 
@@ -305,6 +302,7 @@ export default function VideoPage() {
 
       if (response.status === 200) {
         setComment("");
+        fetchComments(); // コメントリストを再取得
       } else {
         console.error("Failed to add comment:", response);
       }
@@ -370,7 +368,7 @@ export default function VideoPage() {
                 <div className="flex-1">
                   <textarea
                     className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-300"
-                    placeholder="Add a public comment..."
+                    placeholder="コメントを追加..."
                     rows={2}
                     value={comment}
                     onChange={handleCommentChange}
@@ -380,13 +378,13 @@ export default function VideoPage() {
                       className="bg-gray-200 text-gray-700 py-1 px-3 rounded-lg"
                       onClick={() => setComment("")}
                     >
-                      Cancel
+                      キャンセル
                     </button>
                     <button
                       className="bg-blue-500 text-white py-1 px-3 rounded-lg"
                       onClick={handleCommentSubmit}
                     >
-                      Comment
+                      コメントを投稿
                     </button>
                   </div>
                 </div>

@@ -356,10 +356,7 @@ export default function UploadPage() {
                   <SelectValue placeholder="言語を選択" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="japanese">日本語</SelectItem>
                   <SelectItem value="english">英語</SelectItem>
-                  <SelectItem value="chinese">中国語</SelectItem>
-                  <SelectItem value="korean">韓国語</SelectItem>
                 </SelectContent>
               </Select>
             </div>

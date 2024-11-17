@@ -58,44 +58,44 @@ export default function VideoPageContent() {
       <Header />
       <div className="flex flex-col w-full py-12 px-4 md:px-8 lg:px-16">
         <main className="w-full">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6">
             {filteredVideos.map((video) => (
-              <div
+                <div
                 key={video.movie_id}
                 onClick={() => handleNavigation(video)}
                 className="group cursor-pointer"
-              >
+                >
                 <div className="bg-card rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 flex flex-col sm:flex-row">
-                  {/* サムネイル画像 */}
-                  <div className="w-full sm:w-1/2 aspect-video relative">
+                    {/* サムネイル画像 */}
+                    <div className="w-full sm:w-1/2 aspect-video relative">
                     {video.thumbnail_url !== "" && video.thumbnail_url !== "1.png" ? (
-                      <Image
+                        <Image
                         src={video.thumbnail_url}
                         alt={video.title}
                         layout="fill"
                         objectFit="cover"
                         className="transition-transform group-hover:scale-110"
-                      />
+                        />
                     ) : (
-                      <Image
+                        <Image
                         src="/thumb1.jpg"
                         alt={video.title}
                         layout="fill"
                         objectFit="cover"
                         className="transition-transform group-hover:scale-110"
-                      />
+                        />
                     )}
-                  </div>
-                  {/* 動画タイトル */}
-                  <div className="w-full sm:w-1/2 p-4 flex items-center">
+                    </div>
+                    {/* 動画タイトル */}
+                    <div className="w-full sm:w-1/2 p-4 flex items-center">
                     <h2 className="text-lg font-semibold line-clamp-2 text-foreground">
-                      {video.title}
+                        {video.title}
                     </h2>
-                  </div>
+                    </div>
                 </div>
-              </div>
+                </div>
             ))}
-          </div>
+            </div>
         </main>
       </div>
     </div>
