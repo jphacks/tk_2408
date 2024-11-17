@@ -46,6 +46,8 @@ export default function LoginPage() {
       if (displayLanguage) {
         localStorage.setItem("displayLanguage", displayLanguage);
       }
+
+      localStorage.setItem("channelId", "18");
   
       if (!isCreate && isLogin) {
         router.push("/");
