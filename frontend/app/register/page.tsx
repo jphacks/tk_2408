@@ -14,7 +14,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [displayLanguage, setDisplayLanguage] = useState("en"); // 初期値
+  const [displayLanguage, setDisplayLanguage] = useState("english"); // 初期値
   const [info, setInfo] = useState(""); // 説明フィールド
   const [thumbnail, setThumbnail] = useState<File | null>(null); // サムネイルファイル
   const [showPassword, setShowPassword] = useState(false);
@@ -61,6 +61,12 @@ export default function RegisterPage() {
       if (userId) {
         localStorage.setItem("userId", userId);
       }
+
+      if (displayLanguage) {
+        localStorage.setItem("displayLanguage", displayLanguage);
+      }
+      
+      localStorage.setItem("channelId", "18");
 
       if (!isCreate && isLogin) {
         setError("すでにアカウントがあります。ログインしてください。");
@@ -194,8 +200,8 @@ export default function RegisterPage() {
                 className="block w-full p-2 border rounded-md text-muted-foreground"
                 required
               >
-                <option value="en">english</option>
-                <option value="ja">japanese</option>
+                <option value="english">english</option>
+                <option value="japanese">japanese</option>
               </select>
             </div>
             <div className="relative">
