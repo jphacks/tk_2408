@@ -106,18 +106,24 @@ export default function UploadPage() {
     formData.append("title", title);
     formData.append("language", language);
     formData.append("tags", tags);
+
+    // 処理済み動画の取得とアップロードを修正
     if (processedVideoUrl) {
       try {
-        const response = await axios.get(processedVideoUrl, {
-          responseType: "blob",
-        });
-        const processedFile = new File([response.data], "processed_video.mp4", {
+        const response = await fetch(processedVideoUrl);
+        if (!response.ok) throw new Error("Failed to fetch processed video");
+
+        const blob = await response.blob();
+        const originalFileName = file?.name || "video";
+        const timestamp = new Date().getTime();
+        const processedFileName = `processed_${timestamp}_${originalFileName}`;
+
+        const processedFile = new File([blob], processedFileName, {
           type: "video/mp4",
         });
         formData.append("movie", processedFile);
       } catch (error) {
         console.error("Error downloading processed video:", error);
-        // ダウンロードに失敗した場合は元のファイルを使用
         if (file) {
           formData.append("movie", file);
         } else {
@@ -126,10 +132,9 @@ export default function UploadPage() {
           );
         }
       }
-    } else if (file) {
-      formData.append("movie", file);
     } else {
-      throw new Error("動画ファイルが選択されていません。");
+      // 処理済み動画がない場合は元の動画を使用
+      formData.append("movie", file);
     }
     formData.append("thumbnail", thumbnail);
     formData.append("category", category);
